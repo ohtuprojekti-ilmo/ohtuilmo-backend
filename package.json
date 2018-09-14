@@ -1,0 +1,36 @@
+{
+  "name": "retrospective-tool-backend",
+  "version": "1.0.0",
+  "description": "Node.js backend for retrospective tool",
+  "main": "index.js",
+  "scripts": {
+    "watch": "cross-env NODE_ENV=development nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohtuprojekti-ilmo/ohtuilmo-backend.git"
+  },
+  "keywords": [
+    "node"
+  ],
+  "author": "jexniemi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ohtuprojekti-ilmo/ohtuilmo-backend/issues"
+  },
+  "homepage": "https://github.com/ohtuprojekti-ilmo/ohtuilmo-backend#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "pg": "^7.4.3",
+    "sequelize": "^4.38.1"
+  },
+  "devDependencies": {
+    "cross-env": "^5.1.4",
+    "nodemon": "^1.17.2"
+  }
+}
