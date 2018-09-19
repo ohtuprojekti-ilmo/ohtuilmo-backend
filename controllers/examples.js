@@ -2,11 +2,9 @@ const examplesRouter = require('express').Router()
 const Example = require('../models/example')
 
 
-// examplesRouter.get('/', async (request, response) => {
-// 	const examples = await Example
-// 		.find({})
-// 	response.json(examples)
-// })
+examplesRouter.get('/', async (request, response) => {
+	response.json({ "test": "ok"})
+})
 
 // examplesRouter.post('/', async (request, response) => {
 // 	try {
