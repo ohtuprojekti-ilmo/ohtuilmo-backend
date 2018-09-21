@@ -5,7 +5,7 @@ Clone and run:
 `npm install`
 
 ## Instructions
-Create .env files and add following lines:
+Create .env file to the project root and add following lines:
 
 ```
 DATABASE_URI=TODO
