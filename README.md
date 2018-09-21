@@ -17,6 +17,8 @@ TEST_DATABASE_URI=//
 
 Run "npm run watch" to run the project in watch mode
 
-Test get request: http://localhost:3001/api/examples/. Should return { "test": "ok"}
+Test get request: http://localhost:3001/api/examples/. Should return { "test": "ok" }
 
 ## Docker instructions
+
+Docker
