@@ -21,4 +21,4 @@ Test get request: http://localhost:3001/api/examples/. Should return { "test": "
 
 ## Docker instructions
 
-Docker
+[Docker cheatsheet](https://github.com/jexniemi/Docker-cheat-page/wiki)
