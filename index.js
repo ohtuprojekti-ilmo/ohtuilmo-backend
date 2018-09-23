@@ -2,6 +2,7 @@ const http = require('http')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const logger = require('./utils/middleware/logger')
 const cors = require('cors')
 const pg = require('pg');
 const config = require('./utils/config')
@@ -10,6 +11,7 @@ const config = require('./utils/config')
 // Middleware
 app.use(cors())
 app.use(bodyParser.json())
+app.use(logger)
 
 
 // Routers

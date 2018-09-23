@@ -5,3 +5,7 @@ install:
   - npm install
 script:
   - npm run test
+after_success:
+  - "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
+  - "docker build -t ohtuprojektiilmo/ohtuback ."
+  - "docker push ohtuprojektiilmo/ohtuback"
