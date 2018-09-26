@@ -6,17 +6,31 @@ const logger = require('./utils/middleware/logger')
 const cors = require('cors')
 const pg = require('pg');
 const config = require('./utils/config')
+const session = require('express-session')
 
+//passport init
+const passport = require('passport')
+const passportConf = require('./passportConf')
+passportConf.configure(passport)
 
 // Middleware
 app.use(cors())
 app.use(bodyParser.json())
 app.use(logger)
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
 
 
 // Routers
 const examplesRouter = require('./controllers/examples')
+const loginRouter = require('./controllers/login')(passport, '/api/login')
 app.use('/api/examples', examplesRouter)
+app.use('/api/login', loginRouter)
 
 
 // Database connection
