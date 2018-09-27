@@ -4,13 +4,8 @@ const passport = require('passport')
 module.exports = function (passport, path) {
 
     loginRouter.get('/okTest', (req, res) => {
-        if (req.isAuthenticated()) {
-            console.log('success')
-            console.log(req.user.username)
-            res.status(200).send( {user: req.user})
-        } else {
-            res.redirect(`${path}/failTest`)
-        }
+            console.log(req)
+            res.status(200).send({ user: req.user })
     })
 
     loginRouter.get('/failTest', (req, res) => {
@@ -21,12 +16,14 @@ module.exports = function (passport, path) {
 
     loginRouter.post('/', passport.authenticate('local',
         {
-            successRedirect: `${path}/okTest`,
+            // successRedirect: `${path}/okTest`,
             failureRedirect: `${path}/failTest`,
             failureFlash: true,
             badRequestMessage: 'Missing fields'
         }
-    ))
+    ), (req, res) => {
+        res.status(200).send({ user: req.user })
+    })
     loginRouter.get('/sessionTest', passport.authenticate('local',
         {
             successRedirect: `${path}/okTest`,

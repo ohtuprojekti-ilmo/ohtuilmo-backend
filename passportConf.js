@@ -13,6 +13,7 @@ function configure(passport) {
             if (auth.data.error) {
                 return cb(null, false, { message: "Incorrect credentials" })
             }
+            console.log(auth.data)
             return cb(null, auth.data)
         }))
 
