@@ -10,6 +10,12 @@ var users = [
         "username": "username2",
         "student_number": "456",
         "email": "test2@email.com"
+    },
+    {
+        "username": "testertester",
+        "student_number": "012345678",
+        "first_names": "Timo *Teppo Tellervo",
+        "last_name": "Testaaja"
     }
 ]
 
@@ -28,7 +34,7 @@ function findByUsername(username) {
 
 async function authenticate(username, password) {
     try {
-        const response = await axios.post('http://localhost:5000/api/login',
+        const response = await axios.post('http://opetushallinto.cs.helsinki.fi/login',
             {
                 'username': username,
                 'password': password

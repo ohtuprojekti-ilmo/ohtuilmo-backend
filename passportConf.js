@@ -13,11 +13,7 @@ function configure(passport) {
             if (auth.data.error) {
                 return cb(null, false, { message: "Incorrect credentials" })
             }
-            const user = User.findByUsername(username)
-            if(!user) {
-                return cb(null, false, { message: "User not in db" })
-            }
-            return cb(null, user)
+            return cb(null, auth.data)
         }))
 
 
