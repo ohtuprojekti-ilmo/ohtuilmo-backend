@@ -7,6 +7,7 @@ const cors = require('cors')
 const pg = require('pg');
 const config = require('./utils/config')
 const session = require('express-session')
+const flash = require('connect-flash')
 
 //passport init
 const passport = require('passport')
@@ -24,6 +25,7 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(flash())
 
 
 // Routers
