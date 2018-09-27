@@ -2,19 +2,19 @@ const axios = require('axios')
 
 var users = [
     {
-        "id": 1,
         "username": "username",
+        "student_number": "123",
         "email": "test@email.com"
     },
     {
-        "id": 2,
         "username": "username2",
+        "student_number": "456",
         "email": "test2@email.com"
     }
 ]
 
 function findById(id, cb) {
-    const user = users.find(user => user.id === id)
+    const user = users.find(user => user.student_number === id)
     if (!user) {
         return cb(new Error(`User with id ${id} does not exist`))
     }
@@ -39,7 +39,7 @@ async function authenticate(username, password) {
         )
         return response
     } catch (error) {
-        return { error: error }
+        throw error
     }
 }
 

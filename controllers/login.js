@@ -15,13 +15,16 @@ module.exports = function (passport, path) {
 
     loginRouter.get('/failTest', (req, res) => {
         console.log('failure')
+        console.log(req.flash('error'))
         res.status(401).send()
     })
 
     loginRouter.post('/', passport.authenticate('local',
         {
             successRedirect: `${path}/okTest`,
-            failureRedirect: `${path}/failTest`
+            failureRedirect: `${path}/failTest`,
+            failureFlash: true,
+            badRequestMessage: 'Missing fields'
         }
     ))
     loginRouter.get('/sessionTest', passport.authenticate('local',
