@@ -7,7 +7,7 @@ module.exports = function (passport, path) {
         if (req.isAuthenticated()) {
             console.log('success')
             console.log(req.user.username)
-            res.status(200).send(req.user)
+            res.status(200).send( {user: req.user})
         } else {
             res.redirect(`${path}/failTest`)
         }
