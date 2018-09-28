@@ -19,12 +19,13 @@ var users = [
     }
 ]
 
-function findById(id, cb) {
+function addUser(user) {
+    users.push(user)
+}
+
+function findById(id) {
     const user = users.find(user => user.student_number === id)
-    if (!user) {
-        return cb(new Error(`User with id ${id} does not exist`))
-    }
-    return cb(null, user)
+    return user
 }
 
 function findByUsername(username) {
@@ -38,9 +39,6 @@ async function authenticate(username, password) {
             {
                 'username': username,
                 'password': password
-            },
-            {
-                validateStatus: (status) => status <= 400
             }
         )
         return response
