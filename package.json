@@ -1,7 +1,7 @@
 {
-  "name": "retrospective-tool-backend",
+  "name": "ohtuilmo-backend",
   "version": "1.0.0",
-  "description": "Node.js backend for retrospective tool",
+  "description": "Node.js backend",
   "main": "index.js",
   "scripts": {
     "watch": "cross-env NODE_ENV=development nodemon index.js",
