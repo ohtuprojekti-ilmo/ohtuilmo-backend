@@ -12,10 +12,13 @@ const getTokenFrom = (request) => {
 
 module.exports = (secret) => {
     loginRouter.post('/', async (req, res) => {
+        if (!req.body.username || !req.body.password) {
+            return res.status(400).send({ error: "missing username or password" })
+        }
         try {
             const response = await userModel.authenticate(req.body.username, req.body.password)
             if (response.data.error) {
-                return res.status(401).send({ error: response.data.error })
+                return res.status(401).send({ error: "incorrect credentials" })
             }
             const user = response.data
             const token = jwt.sign({ id: user.student_number }, secret)
@@ -29,8 +32,6 @@ module.exports = (secret) => {
         try {
             const token = getTokenFrom(req)
             const decodedToken = jwt.verify(token, secret)
-            console.log(token)
-            console.log(decodedToken)
 
             if (!token || !decodedToken.id) {
                 return res.status(401).send({ error: "token missing or invalid" })
