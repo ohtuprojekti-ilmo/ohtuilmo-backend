@@ -23,6 +23,10 @@ app.use('/api/login', loginRouter)
 // const client = new pg.Client(connectionString)
 // client.connect();
 
+// Database connection
+const db = require('./models')
+db.connect()
+
 // Initialize server
 const PORT = config.port
 const server = http.createServer(app)
@@ -32,10 +36,9 @@ server.listen(PORT, () => {
 
 server.on('close', () => {
   // Close database connection
-  // client
-  //   .end()
-  //   .then(() => console.log('client has disconnected'))
-  //   .catch(() => console.error('error during disconnection', err.stack))
+  db.sequelize.close()
+    .then(() => console.log('client has disconnected'))
+    .catch(() => console.error('error during disconnection', err.stack))
 })
 
 module.exports = {
