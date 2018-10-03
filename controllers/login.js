@@ -1,6 +1,7 @@
 const loginRouter = require('express').Router()
 const jwt = require('jsonwebtoken')
-const userModel = require('../models/mockUser')
+const config = require('../utils/config')
+const axios = require('axios')
 
 const getTokenFrom = (request) => {
     const authorization = request.headers.authorization
@@ -10,42 +11,57 @@ const getTokenFrom = (request) => {
     return null
 }
 
-module.exports = (secret) => {
-    loginRouter.post('/', async (req, res) => {
-        if (!req.body.username || !req.body.password) {
-            return res.status(400).send({ error: "missing username or password" })
-        }
-        try {
-            const response = await userModel.authenticate(req.body.username, req.body.password)
-            if (response.data.error) {
-                return res.status(401).send({ error: "incorrect credentials" })
+async function authenticate(username, password) {
+    try {
+        const response = await axios.post(config.login,
+            {
+                'username': username,
+                'password': password
             }
-            const user = response.data
-            const token = jwt.sign({ id: user.student_number }, secret)
-            res.status(200).send({ token, username: user.username, student_number: user.student_number, first_names: user.first_names, last_name: user.last_name })
-        } catch (error) {
-            res.status(500).send({ error: error })
-        }
-    })
-
-    loginRouter.get('/tokenTest', (req, res) => {
-        try {
-            const token = getTokenFrom(req)
-            const decodedToken = jwt.verify(token, secret)
-
-            if (!token || !decodedToken.id) {
-                return res.status(401).send({ error: "token missing or invalid" })
-            }
-
-            res.status(200).send({ message: "success" })
-
-        } catch (error) {
-            if (error.name === 'JsonWebTokenError') {
-                response.status(401).json({ error: error.message })
-            } else {
-                response.status(500).json({ error: error })
-            }
-        }
-    })
-    return loginRouter
+        )
+        return response
+    } catch (error) {
+        throw error
+    }
 }
+
+
+loginRouter.post('/', async (req, res) => {
+    if (!req.body.username || !req.body.password) {
+        return res.status(400).json({ error: 'missing username or password' })
+    }
+    try {
+        const response = await authenticate(req.body.username, req.body.password)
+        if (response.data.error) {
+            return res.status(401).json({ error: 'incorrect credentials' })
+        }
+        const user = response.data
+        const token = jwt.sign({ id: user.student_number }, config.secret)
+        res.status(200).json({ token, username: user.username, student_number: user.student_number, first_names: user.first_names, last_name: user.last_name })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'something went wrong' })
+    }
+})
+
+loginRouter.get('/tokenTest', (req, res) => {
+    try {
+        const token = getTokenFrom(req)
+        const decodedToken = jwt.verify(token, config.secret)
+
+        if (!token || !decodedToken.id) {
+            return res.status(401).json({ error: 'token missing or invalid' })
+        }
+
+        res.status(200).json({ message: 'success' })
+
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            res.status(401).json({ error: error.message })
+        } else {
+            res.status(500).json({ error: error })
+        }
+    }
+})
+
+module.exports = loginRouter
