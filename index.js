@@ -4,20 +4,17 @@ const app = express()
 const bodyParser = require('body-parser')
 const logger = require('./utils/middleware/logger')
 const cors = require('cors')
-const pg = require('pg');
+// const pg = require('pg')
 const config = require('./utils/config')
-
 
 // Middleware
 app.use(cors())
 app.use(bodyParser.json())
 app.use(logger)
 
-
 // Routers
 const examplesRouter = require('./controllers/examples')
 app.use('/api/examples', examplesRouter)
-
 
 // Database connection
 // const connectionString = process.env.DATABASE_URI || 'postgres://localhost:5432/todo';
@@ -33,11 +30,13 @@ server.listen(PORT, () => {
 
 server.on('close', () => {
   // Close database connection
-  client.end()
-    .then(() => console.log('client has disconnected'))
-    .catch(() => console.error('error during disconnection', err.stack))
+  // client
+  //   .end()
+  //   .then(() => console.log('client has disconnected'))
+  //   .catch(() => console.error('error during disconnection', err.stack))
 })
 
 module.exports = {
-  app, server
+  app,
+  server
 }
