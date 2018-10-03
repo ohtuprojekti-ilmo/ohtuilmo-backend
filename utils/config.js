@@ -10,7 +10,13 @@ if (process.env.NODE_ENV === 'test') {
   dbUrl = process.env.TEST_DATABASE_URI
 }
 
+let login = 'http://opetushallinto.cs.helsinki.fi/login'
+
+let secret = 'secret'
+
 module.exports = {
   dbUrl,
-  port
+  port,
+  login,
+  secret
 }
