@@ -16,10 +16,7 @@ app.use(logger)
 const examplesRouter = require('./controllers/examples')
 const loginRouter = require('./controllers/login')
 app.use('/api/examples', examplesRouter)
-<<<<<<< HEAD
 app.use('/api/login', loginRouter)
-=======
->>>>>>> master
 
 // Database connection
 // const connectionString = process.env.DATABASE_URI || 'postgres://localhost:5432/todo';
