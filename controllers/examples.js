@@ -1,9 +1,8 @@
 const examplesRouter = require('express').Router()
-const Example = require('../models/example')
-
+// const Example = require('../models/example')
 
 examplesRouter.get('/', async (request, response) => {
-	response.json({ "test": "ok"})
+  response.json({ test: 'ok' })
 })
 
 // examplesRouter.post('/', async (request, response) => {
@@ -15,6 +14,5 @@ examplesRouter.get('/', async (request, response) => {
 // 		console.log(exception)
 // 	}
 // })
-
 
 module.exports = examplesRouter
