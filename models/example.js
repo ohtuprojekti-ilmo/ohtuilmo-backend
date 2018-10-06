@@ -1,1 +1,0 @@
-// Sequelize models here!!!!!
