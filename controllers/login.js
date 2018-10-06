@@ -2,6 +2,7 @@ const loginRouter = require('express').Router()
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
 const axios = require('axios')
+const db = require('../models/index')
 
 const getTokenFrom = (request) => {
   const authorization = request.headers.authorization
@@ -27,20 +28,56 @@ async function authenticate(username, password) {
 
 
 loginRouter.post('/', async (req, res) => {
+
   if (!req.body.username || !req.body.password) {
+    //username or password field undefined
     return res.status(400).json({ error: 'missing username or password' })
   }
   try {
     const response = await authenticate(req.body.username, req.body.password)
     if (response.data.error) {
+      //incorrect credentials response from auth server
       return res.status(401).json({ error: 'incorrect credentials' })
     }
-    const user = response.data
-    const token = jwt.sign({ id: user.student_number }, config.secret)
-    res.status(200).json({ token, username: user.username, student_number: user.student_number, first_names: user.first_names, last_name: user.last_name })
+    console.log(response.data)
+    db.User.findOne({ where: { student_id: response.data.student_number } }).then(foundUser => {
+      if (foundUser) {
+        //user already in database, no need to add
+        const token = jwt.sign({ id: response.data.student_number }, config.secret)
+        return res.status(200).json({
+          token,
+          username: response.data.username,
+          student_number: response.data.student_number,
+          first_names: response.data.first_names,
+          last_name: response.data.last_name
+        })
+      }
+      //user not in database, add user
+      db.User.create({
+        student_id: response.data.student_number,
+        firstNames: response.data.first_names,
+        lastName: response.data.last_name,
+        email: null,
+        admin: false
+      }).then(() => {
+        const token = jwt.sign({ id: response.data.student_number }, config.secret)
+        res.status(200).json({
+          token,
+          username: response.data.username,
+          student_number: response.data.student_number,
+          first_names: response.data.first_names,
+          last_name: response.data.last_name
+        })
+      }).error((error) => {
+        //error saving to database
+        console.log(error)
+        res.status(500).json({ error: 'database error' })
+      })
+    })
   } catch (error) {
+    //error from auth server
     console.log(error)
-    res.status(500).json({ error: 'something went wrong' })
+    res.status(500).json({ error: 'authentication error' })
   }
 })
 
