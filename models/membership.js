@@ -17,7 +17,7 @@ module.exports = (sequelize, Sequelize) => {
 
     Membership.associate = (models) => {
       Membership.hasOne(models.User, {
-        foreignKey: 'student_id',
+        foreignKey: 'student_number',
       })
     }
   
