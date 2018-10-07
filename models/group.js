@@ -2,6 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   const Group = sequelize.define('group', {
     group_id: {
       type: Sequelize.INTEGER,
+      autoIncrement: true,
       primaryKey: true
     },
     group_name: {
