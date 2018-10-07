@@ -1,13 +1,16 @@
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define('user', {
-    student_id: {
+    student_number: {
       type: Sequelize.INTEGER,
       primaryKey: true
     },
-    firstNames: {
+    username: {
       type: Sequelize.STRING
     },
-    lastName: {
+    first_names: {
+      type: Sequelize.STRING
+    },
+    last_name: {
       type: Sequelize.STRING
     },
     email: {
@@ -21,7 +24,7 @@ module.exports = (sequelize, Sequelize) => {
 
   User.associate = (models) => {
     User.hasMany(models.Membership, {
-      foreignKey: 'student_id',
+      foreignKey: 'student_number',
       as: 'memberships',
     })
   }
