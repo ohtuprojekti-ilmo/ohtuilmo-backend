@@ -40,7 +40,7 @@ server.on('close', () => {
   // Close database connection
   db.sequelize.close()
     .then(() => console.log('client has disconnected'))
-    .catch(() => console.error('error during disconnection', err.stack))
+    .catch(err => console.error('error during disconnection', err.stack))
 })
 
 module.exports = {
