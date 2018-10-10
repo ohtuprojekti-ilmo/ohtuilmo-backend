@@ -41,6 +41,12 @@
     "babel-eslint": "^10.0.1",
     "cross-env": "^5.1.4",
     "eslint": "^5.6.1",
+    "husky": "^1.1.1",
     "nodemon": "^1.17.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
   }
 }
