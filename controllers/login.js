@@ -4,14 +4,6 @@ const config = require('../utils/config')
 const axios = require('axios')
 const db = require('../models/index')
 
-const getTokenFrom = (request) => {
-  const authorization = request.headers.authorization
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.substring(7)
-  }
-  return null
-}
-
 async function authenticate(username, password) {
   try {
     const response = await axios.post(config.login,
@@ -26,7 +18,6 @@ async function authenticate(username, password) {
   }
 }
 
-
 loginRouter.post('/', async (req, res) => {
 
   if (!req.body.username || !req.body.password) {
@@ -39,7 +30,6 @@ loginRouter.post('/', async (req, res) => {
       //incorrect credentials response from auth server
       return res.status(401).json({ error: 'incorrect credentials' })
     }
-    console.log(response.data)
     db.User.findOne({ where: { student_number: response.data.student_number } }).then(foundUser => {
       if (foundUser) {
         //user already in database, no need to add
@@ -65,11 +55,11 @@ loginRouter.post('/', async (req, res) => {
         last_name: newUser.last_name,
         email: newUser.email,
         admin: newUser.admin
-      }).then(() => {
+      }).then(savedUser => {
         const token = jwt.sign({ id: response.data.student_number }, config.secret)
         res.status(200).json({
           token,
-          user: newUser
+          user: savedUser
         })
       }).error((error) => {
         //error saving to database
@@ -81,26 +71,6 @@ loginRouter.post('/', async (req, res) => {
     //error from auth server
     console.log(error)
     res.status(500).json({ error: 'authentication error' })
-  }
-})
-
-loginRouter.get('/tokenTest', (req, res) => {
-  try {
-    const token = getTokenFrom(req)
-    const decodedToken = jwt.verify(token, config.secret)
-
-    if (!token || !decodedToken.id) {
-      return res.status(401).json({ error: 'token missing or invalid' })
-    }
-
-    res.status(200).json({ message: 'success' })
-
-  } catch (error) {
-    if (error.name === 'JsonWebTokenError') {
-      res.status(401).json({ error: error.message })
-    } else {
-      res.status(500).json({ error: error })
-    }
   }
 })
 
