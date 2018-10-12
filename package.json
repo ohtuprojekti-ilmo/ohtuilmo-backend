@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "cross-env NODE_ENV=development nodemon index.js",
     "start": "cross-env NODE_ENV=production node index.js",
-    "test": "echo \"No tests specified\" && exit 0",
+    "test": "npm run lint",
     "lint": "eslint ."
   },
   "repository": {
@@ -41,6 +41,12 @@
     "babel-eslint": "^10.0.1",
     "cross-env": "^5.1.4",
     "eslint": "^5.6.1",
+    "husky": "^1.1.1",
     "nodemon": "^1.17.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
   }
 }
