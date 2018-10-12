@@ -30,33 +30,26 @@ loginRouter.post('/', async (req, res) => {
       //incorrect credentials response from auth server
       return res.status(401).json({ error: 'incorrect credentials' })
     }
-    db.User.findOne({ where: { student_number: response.data.student_number } }).then(foundUser => {
+    const authenticatedUser = response.data
+    db.User.findOne({ where: { student_number: authenticatedUser.student_number } }).then(foundUser => {
       if (foundUser) {
         //user already in database, no need to add
-        const token = jwt.sign({ id: response.data.student_number }, config.secret)
+        const token = jwt.sign({ id: foundUser.student_number }, config.secret)
         return res.status(200).json({
           token,
           user: foundUser
         })
       }
       //user not in database, add user
-      const newUser = {
-        username: response.data.username,
-        student_number: response.data.student_number,
-        first_names: response.data.first_names,
-        last_name: response.data.last_name,
+      db.User.create({
+        username: authenticatedUser.username,
+        student_number: authenticatedUser.student_number,
+        first_names: authenticatedUser.first_names,
+        last_name: authenticatedUser.last_name,
         email: null,
         admin: false
-      }
-      db.User.create({
-        username: newUser.username,
-        student_number: newUser.student_number,
-        first_names: newUser.first_names,
-        last_name: newUser.last_name,
-        email: newUser.email,
-        admin: newUser.admin
       }).then(savedUser => {
-        const token = jwt.sign({ id: response.data.student_number }, config.secret)
+        const token = jwt.sign({ id: savedUser.student_number }, config.secret)
         res.status(200).json({
           token,
           user: savedUser
