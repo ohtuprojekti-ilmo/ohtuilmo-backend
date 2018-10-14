@@ -27,15 +27,18 @@ db.connect = () => {
 
     const UserModel = require('./user')
     const GroupModel = require('./group')
+    const TopicModel = require('./topic')
     //const Review = require('./review')
     //const Review_answer = require('./review_answer')
 
     const User = UserModel(sequelize, Sequelize)
     const Group = GroupModel(sequelize, Sequelize)
+    const Topic = TopicModel(sequelize, Sequelize)
 
 
     db.User = User
     db.Group = Group
+    db.Topic = Topic
     db.sequelize = sequelize
     db.Sequelize = Sequelize
 
