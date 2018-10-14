@@ -16,9 +16,11 @@ app.use(logger)
 const examplesRouter = require('./controllers/examples')
 const loginRouter = require('./controllers/login')
 const groupsRouter = require('./controllers/groups')
+const topicsRouter = require('./controllers/topics')
 app.use('/api/examples', examplesRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/groups', groupsRouter)
+app.use('/api/topics', topicsRouter)
 
 // Database connection
 // const connectionString = process.env.DATABASE_URI || 'postgres://localhost:5432/todo';
