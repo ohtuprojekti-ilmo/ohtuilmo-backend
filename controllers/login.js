@@ -4,14 +4,6 @@ const config = require('../utils/config')
 const axios = require('axios')
 const db = require('../models/index')
 
-const getTokenFrom = (request) => {
-  const authorization = request.headers.authorization
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.substring(7)
-  }
-  return null
-}
-
 async function authenticate(username, password) {
   try {
     const response = await axios.post(config.login,
@@ -26,7 +18,6 @@ async function authenticate(username, password) {
   }
 }
 
-
 loginRouter.post('/', async (req, res) => {
 
   if (!req.body.username || !req.body.password) {
@@ -39,37 +30,29 @@ loginRouter.post('/', async (req, res) => {
       //incorrect credentials response from auth server
       return res.status(401).json({ error: 'incorrect credentials' })
     }
-    console.log(response.data)
-    db.User.findOne({ where: { student_number: response.data.student_number } }).then(foundUser => {
+    const authenticatedUser = response.data
+    db.User.findOne({ where: { student_number: authenticatedUser.student_number } }).then(foundUser => {
       if (foundUser) {
         //user already in database, no need to add
-        const token = jwt.sign({ id: response.data.student_number }, config.secret)
+        const token = jwt.sign({ id: foundUser.student_number }, config.secret)
         return res.status(200).json({
           token,
           user: foundUser
         })
       }
       //user not in database, add user
-      const newUser = {
-        username: response.data.username,
-        student_number: response.data.student_number,
-        first_names: response.data.first_names,
-        last_name: response.data.last_name,
+      db.User.create({
+        username: authenticatedUser.username,
+        student_number: authenticatedUser.student_number,
+        first_names: authenticatedUser.first_names,
+        last_name: authenticatedUser.last_name,
         email: null,
         admin: false
-      }
-      db.User.create({
-        username: newUser.username,
-        student_number: newUser.student_number,
-        first_names: newUser.first_names,
-        last_name: newUser.last_name,
-        email: newUser.email,
-        admin: newUser.admin
-      }).then(() => {
-        const token = jwt.sign({ id: response.data.student_number }, config.secret)
+      }).then(savedUser => {
+        const token = jwt.sign({ id: savedUser.student_number }, config.secret)
         res.status(200).json({
           token,
-          user: newUser
+          user: savedUser
         })
       }).error((error) => {
         //error saving to database
@@ -81,26 +64,6 @@ loginRouter.post('/', async (req, res) => {
     //error from auth server
     console.log(error)
     res.status(500).json({ error: 'authentication error' })
-  }
-})
-
-loginRouter.get('/tokenTest', (req, res) => {
-  try {
-    const token = getTokenFrom(req)
-    const decodedToken = jwt.verify(token, config.secret)
-
-    if (!token || !decodedToken.id) {
-      return res.status(401).json({ error: 'token missing or invalid' })
-    }
-
-    res.status(200).json({ message: 'success' })
-
-  } catch (error) {
-    if (error.name === 'JsonWebTokenError') {
-      res.status(401).json({ error: error.message })
-    } else {
-      res.status(500).json({ error: error })
-    }
   }
 })
 
