@@ -2,7 +2,8 @@ module.exports = (sequelize, Sequelize) => {
   const Review_answer = sequelize.define('review_answer', {
     review_answer_id: {
       type: Sequelize.INTEGER,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
     answers: {
       type: Sequelize.JSONB
