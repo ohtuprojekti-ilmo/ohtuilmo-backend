@@ -16,19 +16,33 @@ membershipRouter.post('/', checkLogin, (req, res) => {
 
   db.User.findOne({ where: { student_number: req.body.student_number } })
     .then(user => {
-      if(!user) return res.status(400).json({ error: 'user not found' })
+      if (!user) return res.status(400).json({ error: 'user not found' })
 
       db.Group.findById(req.body.group_id)
         .then(group => {
           if (!group) return res.status(400).json({ error: 'group not found' })
 
-          db.Membership.create({
-            group_id: req.body.group_id,
-            student_number: req.body.student_number,
-            role: req.body.role
+          db.Membership.findOne({
+            where: {
+              student_number: req.body.student_number,
+              group_id: req.body.group_id
+            }
           })
-            .then(group => {
-              return res.status(200).json({ group })
+            .then(membership => {
+              if (membership) return res.status(400).json({ error: 'user is already in that group' })
+              
+              db.Membership.create({
+                group_id: req.body.group_id,
+                student_number: req.body.student_number,
+                role: req.body.role
+              })
+                .then(group => {
+                  return res.status(200).json({ group })
+                })
+                .error(error => {
+                  console.log(error)
+                  res.status(500).json({ error: 'database error' })
+                })
             })
             .error(error => {
               console.log(error)
@@ -41,10 +55,9 @@ membershipRouter.post('/', checkLogin, (req, res) => {
         })
     })
     .error(error => {
-      console.log(erro)
+      console.log(error)
       res.status(500).json({ error: 'database error' })
-    })    
+    })
 })
 
 module.exports = membershipRouter
-
