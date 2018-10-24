@@ -26,7 +26,7 @@ loginRouter.post('/', async (req, res) => {
   }
   try {
     const response = await authenticate(req.body.username, req.body.password)
-    if (response.data.error) {
+    if (response.data.catch) {
       //incorrect credentials response from auth server
       return res.status(401).json({ error: 'incorrect credentials' })
     }
@@ -54,7 +54,7 @@ loginRouter.post('/', async (req, res) => {
           token,
           user: savedUser
         })
-      }).error((error) => {
+      }).catch((error) => {
         //error saving to database
         console.log(error)
         res.status(500).json({ error: 'database error' })
