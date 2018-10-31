@@ -3,7 +3,7 @@ const db = require('../models/index')
 const checkLogin = require('../utils/middleware/checkLogin').checkLogin
 
 function checkIfValidRole(role) {
-  roles = ['student', 'teacher']
+  var roles = ['student', 'teacher']
   if (roles.includes(role)) return true
   return false
 }
