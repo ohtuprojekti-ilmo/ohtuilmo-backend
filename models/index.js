@@ -42,9 +42,9 @@ db.connect = () => {
     db.Membership = Membership
     db.Topic = Topic
 
-    db.User.associate(db);
-    db.Group.associate(db);
-    
+    db.User.associate(db)
+    db.Group.associate(db)
+
     db.sequelize = sequelize
     db.Sequelize = Sequelize
     sequelize.sync()
