@@ -26,7 +26,7 @@ loginRouter.post('/', async (req, res) => {
   }
   try {
     const response = await authenticate(req.body.username, req.body.password)
-    if (response.data.catch) {
+    if (response.data.error) {
       //incorrect credentials response from auth server
       return res.status(401).json({ error: 'incorrect credentials' })
     }
