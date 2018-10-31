@@ -30,7 +30,7 @@ membershipRouter.post('/', checkLogin, (req, res) => {
           })
             .then(membership => {
               if (membership) return res.status(400).json({ error: 'user is already in that group' })
-              
+
               db.Membership.create({
                 group_id: req.body.group_id,
                 student_number: req.body.student_number,
