@@ -2,24 +2,15 @@ module.exports = (sequelize, Sequelize) => {
   const Membership = sequelize.define('membership', {
     membership_id: {
       type: Sequelize.INTEGER,
+      autoIncrement: true,
       primaryKey: true
     },
-    answers: {
-      type: Sequelize.JSONB
+    role: {
+      type: Sequelize.STRING
     }
+  }, {
+    underscored: true
   })
-
-  Membership.associate = (models) => {
-    Membership.hasOne(models.Group, {
-      foreignKey: 'group_id',
-    })
-  }
-
-  Membership.associate = (models) => {
-    Membership.hasOne(models.User, {
-      foreignKey: 'student_number',
-    })
-  }
 
   return Membership
 }
