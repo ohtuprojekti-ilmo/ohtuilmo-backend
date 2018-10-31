@@ -54,7 +54,7 @@ loginRouter.post('/', async (req, res) => {
           token,
           user: savedUser
         })
-      }).error((error) => {
+      }).catch((error) => {
         //error saving to database
         console.log(error)
         res.status(500).json({ error: 'database error' })
