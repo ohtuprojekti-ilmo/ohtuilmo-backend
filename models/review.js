@@ -2,7 +2,8 @@ module.exports = (sequelize, Sequelize) => {
   const Review = sequelize.define('review', {
     review_id: {
       type: Sequelize.INTEGER,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
     year: {
       type: Sequelize.INTEGER

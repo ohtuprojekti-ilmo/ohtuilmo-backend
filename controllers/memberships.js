@@ -39,22 +39,22 @@ membershipRouter.post('/', checkLogin, (req, res) => {
                 .then(group => {
                   return res.status(200).json({ group })
                 })
-                .error(error => {
+                .catch(error => {
                   console.log(error)
                   res.status(500).json({ error: 'database error' })
                 })
             })
-            .error(error => {
+            .catch(error => {
               console.log(error)
               res.status(500).json({ error: 'database error' })
             })
         })
-        .error(error => {
+        .catch(error => {
           console.log(error)
           res.status(500).json({ error: 'database error' })
         })
     })
-    .error(error => {
+    .catch(error => {
       console.log(error)
       res.status(500).json({ error: 'database error' })
     })
