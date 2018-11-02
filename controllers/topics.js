@@ -1,5 +1,7 @@
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
+const checkLogin = require('../utils/middleware/checkLogin').checkLogin
+
 
 topicsRouter.post('/', (req, res) => {
   if (!req.body.content) return res.status(400).json({ error: 'content undefined' })
@@ -15,7 +17,7 @@ topicsRouter.post('/', (req, res) => {
     })
 })
 
-topicsRouter.get('/', async (req, res) => {
+topicsRouter.get('/', checkLogin, async (req, res) => {
   try {
     db.Topic.findAll({}).then(topics => {
       if (topics) {
