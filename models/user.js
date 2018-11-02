@@ -1,3 +1,4 @@
+'use strict'
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define('user', {
     student_number: {
@@ -25,14 +26,11 @@ module.exports = (sequelize, Sequelize) => {
   User.associate = (models) => {
     User.hasMany(models.Membership, {
       foreignKey: 'student_number',
-      as: 'memberships',
+      as: 'Memberships',
     })
-  }
-
-  User.associate = (models) => {
-    User.hasOne(models.Review_answer, {
-      foreignKey: 'review_answer_id',
-    })
+    // User.hasOne(models.Review_answer, {
+    //   foreignKey: 'review_answer_id',
+    // })
   }
 
   return User
