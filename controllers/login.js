@@ -34,7 +34,7 @@ loginRouter.post('/', async (req, res) => {
     db.User.findOne({ where: { student_number: authenticatedUser.student_number } }).then(foundUser => {
       if (foundUser) {
         //user already in database, no need to add
-        const token = jwt.sign({ id: foundUser.student_number }, config.secret)
+        const token = jwt.sign({ id: foundUser.student_number, admin: foundUser.admin }, config.secret)
         return res.status(200).json({
           token,
           user: foundUser
@@ -49,7 +49,7 @@ loginRouter.post('/', async (req, res) => {
         email: null,
         admin: false
       }).then(savedUser => {
-        const token = jwt.sign({ id: savedUser.student_number }, config.secret)
+        const token = jwt.sign({ id: savedUser.student_number, admin: savedUser.admin }, config.secret)
         res.status(200).json({
           token,
           user: savedUser
