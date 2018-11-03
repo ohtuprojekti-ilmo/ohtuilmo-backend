@@ -40,4 +40,16 @@ topicsRouter.put('/:id', checkLogin, (req, res) => {
     })
 })
 
+topicsRouter.get('/', checkLogin, (req, res) => {
+  try {
+    db.Topic.findAll({}).then(topics => {
+      if (topics) {
+        return res.status(200).json(topics)
+      }
+    })
+  } catch (error) {
+    res.status(500).json({ error: 'database error' })
+  }
+})
+
 module.exports = topicsRouter
