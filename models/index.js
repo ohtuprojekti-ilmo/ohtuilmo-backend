@@ -29,6 +29,7 @@ db.connect = () => {
     const GroupModel = require('./group')
     const MembershipModel = require('./membership')
     const TopicModel = require('./topic')
+    const TopicDateModel = require('./topic_date')
     //const Review = require('./review')
     //const Review_answer = require('./review_answer')
 
@@ -36,11 +37,13 @@ db.connect = () => {
     const Group = GroupModel(sequelize, Sequelize)
     const Membership = MembershipModel(sequelize, Sequelize)
     const Topic = TopicModel(sequelize, Sequelize)
+    const TopicDate = TopicDateModel(sequelize, Sequelize)
 
     db.User = User
     db.Group = Group
     db.Membership = Membership
     db.Topic = Topic
+    db.TopicDate = TopicDate
 
     db.User.associate(db)
     db.Group.associate(db)
