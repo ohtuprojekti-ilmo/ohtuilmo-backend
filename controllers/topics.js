@@ -1,6 +1,7 @@
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
 const checkLogin = require('../utils/middleware/checkLogin').checkLogin
+const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
 
 topicsRouter.post('/', (req, res) => {
   if (!req.body.content) return res.status(400).json({ error: 'content undefined' })
@@ -16,7 +17,7 @@ topicsRouter.post('/', (req, res) => {
     })
 })
 
-topicsRouter.put('/:id', checkLogin, (req, res) => {
+topicsRouter.put('/:id', checkAdmin, (req, res) => {
   db.Topic.findById(req.params.id)
     .then(topic => {
       if (!topic) return res.status(400).json({ error: 'no topic with that id' })

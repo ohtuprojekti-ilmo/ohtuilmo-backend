@@ -1,8 +1,8 @@
 const groupsRouter = require('express').Router()
 const db = require('../models/index')
-const checkLogin = require('../utils/middleware/checkLogin').checkLogin
+const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
 
-groupsRouter.post('/', checkLogin, (req, res) => {
+groupsRouter.post('/', checkAdmin, (req, res) => {
   if (!req.body.group_name) return res.status(400).json({ error: 'group name undefined' })
   db.Group.findOne({ where: { group_name: req.body.group_name } })
     .then((foundGroup) => {
