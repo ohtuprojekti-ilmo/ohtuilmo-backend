@@ -17,7 +17,7 @@ topicDatesRouter.post('/', checkAdmin, (req, res) => {
 })
 
 //fetches latest entry
-topicDatesRouter.get('/', checkAdmin, (req, res) => {
+topicDatesRouter.get('/', (req, res) => {
   db.TopicDate.findAll({
     limit: 1,
     order: [['createdAt', 'DESC']]
