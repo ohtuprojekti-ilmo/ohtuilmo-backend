@@ -20,6 +20,10 @@ groupsRouter.post('/', checkAdmin, (req, res) => {
           res.status(500).json({ error: 'database error' })
         })
     })
+    .catch(error => {
+      console.log(error)
+      res.status(500).json({ error: 'database error' })
+    })
 })
 
 module.exports = groupsRouter

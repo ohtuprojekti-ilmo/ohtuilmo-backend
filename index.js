@@ -18,11 +18,13 @@ const loginRouter = require('./controllers/login')
 const groupsRouter = require('./controllers/groups')
 const membershipRouter = require('./controllers/memberships')
 const topicsRouter = require('./controllers/topics')
+const topicDatesrouter = require('./controllers/topicDates')
 app.use('/api/examples', examplesRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/groups', groupsRouter)
 app.use('/api/memberships', membershipRouter)
 app.use('/api/topics', topicsRouter)
+app.use('/api/topicDates', topicDatesrouter)
 
 // Database connection
 // const connectionString = process.env.DATABASE_URI || 'postgres://localhost:5432/todo';
