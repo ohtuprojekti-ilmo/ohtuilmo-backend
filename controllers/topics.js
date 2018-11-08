@@ -1,6 +1,5 @@
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
-const checkLogin = require('../utils/middleware/checkLogin').checkLogin
 const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
 
 topicsRouter.post('/', (req, res) => {
@@ -41,7 +40,7 @@ topicsRouter.put('/:id', checkAdmin, (req, res) => {
     })
 })
 
-topicsRouter.get('/', checkLogin, (req, res) => {
+topicsRouter.get('/', (req, res) => {
   try {
     db.Topic.findAll({}).then(topics => {
       if (topics) {
