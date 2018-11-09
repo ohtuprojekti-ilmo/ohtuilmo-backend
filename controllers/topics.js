@@ -41,15 +41,25 @@ topicsRouter.put('/:id', checkAdmin, (req, res) => {
 })
 
 topicsRouter.get('/', (req, res) => {
-  try {
-    db.Topic.findAll({}).then(topics => {
-      if (topics) {
-        return res.status(200).json(topics)
-      }
+  db.Topic.findAll({})
+    .then(topics => {
+      res.status(200).json(topics)
     })
-  } catch (error) {
-    res.status(500).json({ error: 'database error' })
-  }
+    .catch(error => {
+      console.log(error)
+      res.status(500).json({ error: 'database error' })
+    })
+})
+
+topicsRouter.get('/:id', (req, res) => {
+  db.Topic.findOne({ where: { topic_id: req.params.id } })
+    .then(topic => {
+      res.status(200).json(topic)
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(500).json({ error: 'database error' })
+    })
 })
 
 module.exports = topicsRouter
