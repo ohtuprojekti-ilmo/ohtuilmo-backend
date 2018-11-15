@@ -24,7 +24,7 @@ function send(options) {
     if (error) {
       console.log(error)
     }
-    console.log('sent')
+    console.log('sent: ', info)
   })
 }
 
