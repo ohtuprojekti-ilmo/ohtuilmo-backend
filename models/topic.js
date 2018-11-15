@@ -13,7 +13,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.JSONB
     },
     acronym: {
-       type: Sequelize.STRING
+      type: Sequelize.STRING
     },
     secret_link: {
       type: Sequelize.STRING
