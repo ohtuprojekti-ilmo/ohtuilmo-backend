@@ -15,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
     acronym: {
       type: Sequelize.STRING
     },
-    secret_link: {
+    secret_id: {
       type: Sequelize.STRING
     }
   })
