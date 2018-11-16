@@ -40,8 +40,23 @@ topicsRouter.put('/:id', checkAdmin, (req, res) => {
     })
 })
 
-topicsRouter.get('/', (req, res) => {
+topicsRouter.get('/', checkAdmin, (req, res) => {
   db.Topic.findAll({})
+    .then(topics => {
+      res.status(200).json(topics)
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(500).json({ error: 'database error' })
+    })
+})
+
+topicsRouter.get('/active', (req, res) => {
+  db.Topic.findAll({
+    where: {
+      active: true
+    }
+  })
     .then(topics => {
       res.status(200).json(topics)
     })
