@@ -11,6 +11,12 @@ module.exports = (sequelize, Sequelize) => {
     },
     content: {
       type: Sequelize.JSONB
+    },
+    acronym: {
+      type: Sequelize.STRING
+    },
+    secret_id: {
+      type: Sequelize.STRING
     }
   })
 
