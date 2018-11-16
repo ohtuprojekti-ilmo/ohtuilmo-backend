@@ -2,7 +2,6 @@ const topicsRouter = require('express').Router()
 const db = require('../models/index')
 const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
 const getRandomId = require('../utils/idGeneration').getRandomId
-const Op = db.Sequelize.Op
 
 topicsRouter.post('/', (req, res) => {
   if (!req.body.content) return res.status(400).json({ error: 'content undefined' })
@@ -58,6 +57,7 @@ topicsRouter.get('/', (req, res) => {
 })
 
 topicsRouter.get('/:id', (req, res) => {
+  const Op = db.Sequelize.Op
   db.Topic.findOne({
     where: {
       [Op.or]: [
