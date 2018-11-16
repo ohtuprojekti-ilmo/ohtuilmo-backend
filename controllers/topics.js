@@ -57,22 +57,35 @@ topicsRouter.get('/', (req, res) => {
 })
 
 topicsRouter.get('/:id', (req, res) => {
-  const Op = db.Sequelize.Op
-  db.Topic.findOne({
-    where: {
-      [Op.or]: [
-        { topic_id: req.params.id },
-        { secret_id: req.params.id }
-      ]
-    }
-  })
-    .then(topic => {
-      res.status(200).json(topic)
+  const id = req.params.id
+  //check if normal or 'secret' id
+  if (isNaN(id)) {
+    db.Topic.findOne({
+      where: {
+        secret_id: id
+      }
     })
-    .catch(error => {
-      console.log(error)
-      res.status(500).json({ error: 'database error' })
+      .then(topic => {
+        res.status(200).json(topic)
+      })
+      .catch(error => {
+        console.log(error)
+        res.status(500).json({ error: 'database error' })
+      })
+  } else {
+    db.Topic.findOne({
+      where: {
+        topic_id: id
+      }
     })
+      .then(topic => {
+        res.status(200).json(topic)
+      })
+      .catch(error => {
+        console.log(error)
+        res.status(500).json({ error: 'database error' })
+      })
+  }
 })
 
 module.exports = topicsRouter
