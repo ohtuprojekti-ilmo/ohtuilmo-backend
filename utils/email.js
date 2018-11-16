@@ -3,17 +3,13 @@ const nodemailer = require('nodemailer')
 
 function send(options) {
   const transporter = nodemailer.createTransport({
-    host: config.emailHost,
-    port: config.emailPort,
-    secure: config.emailSecure,
-    auth: {
-      user: config.emailUser,
-      pass: config.emailPass
-    }
+    host: config.email.host,
+    port: config.email.port,
+    secure: config.email.secure
   })
 
   const mailOptions = {
-    from: config.emailSender,
+    from: config.email.sender,
     to: options.to,
     subject: options.subject,
     text: options.text,

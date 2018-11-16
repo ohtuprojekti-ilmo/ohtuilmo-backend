@@ -1,6 +1,7 @@
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
 const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
+const email = require('../utils/email')
 
 topicsRouter.post('/', (req, res) => {
   if (!req.body.content) return res.status(400).json({ error: 'content undefined' })
@@ -8,6 +9,13 @@ topicsRouter.post('/', (req, res) => {
     content: req.body.content
   })
     .then(topic => {
+      const options = {
+        to: 'antti.j.kataja@gmail.com',
+        subject: 'asdf',
+        text: 'moi',
+        html: ''
+      }
+      email.send(options)
       res.status(200).json({ topic })
     })
     .catch(error => {
