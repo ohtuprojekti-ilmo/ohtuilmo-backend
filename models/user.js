@@ -29,7 +29,7 @@ module.exports = (sequelize, Sequelize) => {
       as: 'Memberships',
     })
     // User.hasOne(models.Review_answer, {
-    //   foreignKey: 'review_answer_id',
+    //   foreignKey: 'id',
     // })
   }
 

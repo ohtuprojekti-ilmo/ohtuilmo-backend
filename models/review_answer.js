@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Review_answer = sequelize.define('review_answer', {
-    review_answer_id: {
+    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true
@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
 
   Review_answer.associate = (models) => {
     Review_answer.belongsTo(models.User, {
-      foreignKey: 'review_id',
+      foreignKey: 'id',
     })
   }
 
