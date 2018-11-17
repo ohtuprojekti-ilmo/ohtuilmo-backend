@@ -1,6 +1,7 @@
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
 const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
+const email = require('../utils/email')
 const getRandomId = require('../utils/idGeneration').getRandomId
 
 topicsRouter.post('/', (req, res) => {
@@ -12,6 +13,7 @@ topicsRouter.post('/', (req, res) => {
     secret_id
   })
     .then(topic => {
+      email.sendSecretLink(topic.secret_id, topic.email)
       res.status(200).json({ topic })
     })
     .catch(error => {
