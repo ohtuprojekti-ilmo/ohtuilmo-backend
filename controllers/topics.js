@@ -13,13 +13,7 @@ topicsRouter.post('/', (req, res) => {
     secret_id
   })
     .then(topic => {
-      const options = {
-        to: 'antti.j.kataja@gmail.com',
-        subject: 'asdf',
-        text: 'moi',
-        html: ''
-      }
-      email.send(options)
+      email.sendSecretLink(topic.secret_id, topic.email)
       res.status(200).json({ topic })
     })
     .catch(error => {
