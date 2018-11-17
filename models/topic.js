@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Topic = sequelize.define('topic', {
-    topic_id: {
+    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true

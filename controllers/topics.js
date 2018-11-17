@@ -77,7 +77,7 @@ topicsRouter.get('/:id', (req, res) => {
   } else {
     db.Topic.findOne({
       where: {
-        topic_id: id
+        id: id
       }
     })
       .then(topic => {
