@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Topic = sequelize.define('topic', {
-    topic_id: {
+    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true
@@ -11,6 +11,12 @@ module.exports = (sequelize, Sequelize) => {
     },
     content: {
       type: Sequelize.JSONB
+    },
+    acronym: {
+      type: Sequelize.STRING
+    },
+    secret_id: {
+      type: Sequelize.STRING
     }
   })
 

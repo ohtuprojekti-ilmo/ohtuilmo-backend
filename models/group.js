@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Group = sequelize.define('group', {
-    group_id: {
+    id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
 
   Group.associate = (models) => {
     Group.hasMany(models.Membership, {
-      foreignKey: 'group_id',
+      foreignKey: 'id',
       as: 'groups',
     })
   }

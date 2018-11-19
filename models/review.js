@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Review = sequelize.define('review', {
-    review_id: {
+    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true
@@ -18,7 +18,7 @@ module.exports = (sequelize, Sequelize) => {
 
   Review.associate = (models) => {
     Review.hasMany(models.Review_answer, {
-      foreignKey: 'review_id',
+      foreignKey: 'id',
       as: 'review answers',
     })
   }

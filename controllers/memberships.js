@@ -10,7 +10,7 @@ function checkIfValidRole(role) {
 
 membershipRouter.post('/', checkLogin, (req, res) => {
   if (!req.body.student_number) return res.status(400).json({ error: 'student_number undefined' })
-  if (!req.body.group_id) return res.status(400).json({ error: 'group_id undefined' })
+  if (!req.body.id) return res.status(400).json({ error: 'id undefined' })
   if (!req.body.role) return res.status(400).json({ error: 'role undefined' })
   if (!checkIfValidRole(req.body.role)) return res.status(400).json({ error: 'invalid role' })
 
@@ -18,21 +18,21 @@ membershipRouter.post('/', checkLogin, (req, res) => {
     .then(user => {
       if (!user) return res.status(400).json({ error: 'user not found' })
 
-      db.Group.findById(req.body.group_id)
+      db.Group.findById(req.body.id)
         .then(group => {
           if (!group) return res.status(400).json({ error: 'group not found' })
 
           db.Membership.findOne({
             where: {
               student_number: req.body.student_number,
-              group_id: req.body.group_id
+              id: req.body.id
             }
           })
             .then(membership => {
               if (membership) return res.status(400).json({ error: 'user is already in that group' })
 
               db.Membership.create({
-                group_id: req.body.group_id,
+                id: req.body.id,
                 student_number: req.body.student_number,
                 role: req.body.role
               })

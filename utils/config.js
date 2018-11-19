@@ -14,9 +14,18 @@ let login = 'http://opetushallinto.cs.helsinki.fi/login'
 
 let secret = 'secret'
 
+//email config
+let email = {
+  sender: 'Ohtuilmo Robot <noreply@helsinki.fi>',
+  host: 'smtp.helsinki.fi',
+  port: 587,
+  secure: false
+}
+
 module.exports = {
   dbUrl,
   port,
   login,
-  secret
+  secret,
+  email
 }
