@@ -2,7 +2,7 @@
 const randomstring = require('randomstring')
 
 const getRandomId = () => {
-  return randomstring.generate(8)
+  return ('a' + randomstring.generate(16))
 }
 
 module.exports = {
