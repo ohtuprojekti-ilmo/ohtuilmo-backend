@@ -4,6 +4,12 @@ const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
 const email = require('../utils/email')
 const getRandomId = require('../utils/idGeneration').getRandomId
 
+function format(topic) {
+  let formatted = topic
+  formatted.secret_id = ''
+  return formatted
+}
+
 topicsRouter.post('/', (req, res) => {
   if (!req.body.content) return res.status(400).json({ error: 'content undefined' })
   const secret_id = getRandomId()
@@ -13,6 +19,7 @@ topicsRouter.post('/', (req, res) => {
     secret_id
   })
     .then(topic => {
+      topic = format(topic)
       email.sendSecretLink(topic.secret_id, topic.email)
       res.status(200).json({ topic })
     })
@@ -32,6 +39,7 @@ topicsRouter.put('/:id', checkAdmin, (req, res) => {
         acronym: req.body.acronym
       })
         .then(topic => {
+          topic = format(topic)
           topic.reload().then(topic => {
             res.status(200).json({ topic })
           })
@@ -50,6 +58,7 @@ topicsRouter.put('/:id', checkAdmin, (req, res) => {
 topicsRouter.get('/', checkAdmin, (req, res) => {
   db.Topic.findAll({})
     .then(topics => {
+      topics = topics.map(topic => format(topic))
       res.status(200).json(topics)
     })
     .catch(error => {
@@ -65,6 +74,7 @@ topicsRouter.get('/active', (req, res) => {
     }
   })
     .then(topics => {
+      topics = topics.map(topic => format(topic))
       res.status(200).json(topics)
     })
     .catch(error => {
@@ -83,6 +93,7 @@ topicsRouter.get('/:id', (req, res) => {
       }
     })
       .then(topic => {
+        topic = format(topic)
         res.status(200).json(topic)
       })
       .catch(error => {
@@ -96,6 +107,7 @@ topicsRouter.get('/:id', (req, res) => {
       }
     })
       .then(topic => {
+        topic = format(topic)
         res.status(200).json(topic)
       })
       .catch(error => {
