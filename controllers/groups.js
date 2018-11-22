@@ -1,6 +1,6 @@
 const groupsRouter = require('express').Router()
 const db = require('../models/index')
-const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
+const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
 
 groupsRouter.post('/', checkAdmin, (req, res) => {
   if (!req.body.group_name) return res.status(400).json({ error: 'group name undefined' })

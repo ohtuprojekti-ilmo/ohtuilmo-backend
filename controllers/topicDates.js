@@ -1,6 +1,6 @@
 const topicDatesRouter = require('express').Router()
 const db = require('../models/index')
-const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
+const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
 
 topicDatesRouter.post('/', checkAdmin, (req, res) => {
   if (!req.body.dates) return res.status(400).json({ error: 'dates undefined' })

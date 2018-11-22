@@ -1,6 +1,6 @@
 const membershipRouter = require('express').Router()
 const db = require('../models/index')
-const checkLogin = require('../utils/middleware/checkLogin').checkLogin
+const checkLogin = require('../utils/middleware/routeChecks').checkLogin
 
 function checkIfValidRole(role) {
   var roles = ['student', 'teacher']
