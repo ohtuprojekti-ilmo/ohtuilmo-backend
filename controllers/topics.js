@@ -1,13 +1,17 @@
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
-const checkAdmin = require('../utils/middleware/checkAdmin').checkAdmin
+const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
 const email = require('../utils/email')
 const getRandomId = require('../utils/idGeneration').getRandomId
 
-function format(topic) {
+const format = (topic) => {
   let formatted = topic
   formatted.secret_id = ''
   return formatted
+}
+
+const isSecretId = (id) => {
+  return (id.slice(0, 1) === 'a')
 }
 
 topicsRouter.post('/', (req, res) => {
@@ -29,7 +33,11 @@ topicsRouter.post('/', (req, res) => {
     })
 })
 
-topicsRouter.put('/:id', checkAdmin, (req, res) => {
+topicsRouter.put('/:id', (req, res, next) => {
+  //skip admin check if id is secret id
+  if (isSecretId(req.params.id)) next('route')
+  next()
+}, checkAdmin, (req, res) => {
   db.Topic.findById(req.params.id)
     .then(topic => {
       if (!topic) return res.status(400).json({ error: 'no topic with that id' })
@@ -39,8 +47,8 @@ topicsRouter.put('/:id', checkAdmin, (req, res) => {
         acronym: req.body.acronym
       })
         .then(topic => {
-          topic = format(topic)
           topic.reload().then(topic => {
+            topic = format(topic)
             res.status(200).json({ topic })
           })
         })
@@ -59,7 +67,7 @@ topicsRouter.get('/', checkAdmin, (req, res) => {
   db.Topic.findAll({})
     .then(topics => {
       topics = topics.map(topic => format(topic))
-      res.status(200).json(topics)
+      res.status(200).json({ topics })
     })
     .catch(error => {
       console.log(error)
@@ -75,7 +83,7 @@ topicsRouter.get('/active', (req, res) => {
   })
     .then(topics => {
       topics = topics.map(topic => format(topic))
-      res.status(200).json(topics)
+      res.status(200).json({ topics })
     })
     .catch(error => {
       console.log(error)
@@ -85,16 +93,16 @@ topicsRouter.get('/active', (req, res) => {
 
 topicsRouter.get('/:id', (req, res) => {
   const id = req.params.id
-  //check if normal or 'secret' id
-  if (isNaN(id)) {
+  if (isSecretId(id)) {
     db.Topic.findOne({
       where: {
         secret_id: id
       }
     })
       .then(topic => {
+        if (!topic) return res.status(400).json({ error: 'no topic with that id' })
         topic = format(topic)
-        res.status(200).json(topic)
+        res.status(200).json({ topic })
       })
       .catch(error => {
         console.log(error)
@@ -107,8 +115,9 @@ topicsRouter.get('/:id', (req, res) => {
       }
     })
       .then(topic => {
+        if (!topic) return res.status(400).json({ error: 'no topic with that id' })
         topic = format(topic)
-        res.status(200).json(topic)
+        res.status(200).json({ topic })
       })
       .catch(error => {
         console.log(error)
