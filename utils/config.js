@@ -21,11 +21,16 @@ let email = {
   port: 587,
   secure: false
 }
+let allowSendEmail = false
+if (process.env.NODE_ENV === 'production') {
+  allowSendEmail = true
+}
 
 module.exports = {
   dbUrl,
   port,
   login,
   secret,
-  email
+  email,
+  allowSendEmail
 }
