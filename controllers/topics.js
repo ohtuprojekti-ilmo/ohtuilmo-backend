@@ -23,7 +23,6 @@ topicsRouter.post('/', (req, res) => {
     secret_id
   })
     .then(topic => {
-      topic = format(topic)
       email.sendSecretLink(topic.secret_id, topic.email)
       res.status(200).json({ topic })
     })
@@ -35,32 +34,66 @@ topicsRouter.post('/', (req, res) => {
 
 topicsRouter.put('/:id', (req, res, next) => {
   //skip admin check if id is secret id
-  if (isSecretId(req.params.id)) next('route')
+  if (isSecretId(req.params.id)) res.locals.isSecret = true
   next()
-}, checkAdmin, (req, res) => {
-  db.Topic.findById(req.params.id)
-    .then(topic => {
-      if (!topic) return res.status(400).json({ error: 'no topic with that id' })
-      topic.update({
-        active: req.body.active,
-        content: req.body.content,
-        acronym: req.body.acronym
-      })
-        .then(topic => {
-          topic.reload().then(topic => {
-            topic = format(topic)
-            res.status(200).json({ topic })
+}, (req, res, next) => {
+  if (!res.locals.isSecret) checkAdmin(req, res, next)
+  else next()
+}, (req, res) => {
+  //don't try to compare id (integer) to secret_id (string) in db
+  if (res.locals.isSecret) {
+    db.Topic.findOne({
+      where: {
+        secret_id: req.params.id
+      }
+    })
+      .then(topic => {
+        if (!topic) return res.status(400).json({ error: 'no topic with that id' })
+        topic.update({
+          active: req.body.active,
+          content: req.body.content,
+          acronym: req.body.acronym
+        })
+          .then(topic => {
+            topic.reload().then(topic => {
+              topic = format(topic)
+              res.status(200).json({ topic })
+            })
           })
+          .catch(error => {
+            console.log(error)
+            res.status(500).json({ error: 'database error' })
+          })
+      })
+      .catch(error => {
+        console.log(error)
+        res.status(500).json({ error: 'database error' })
+      })
+  } else {
+    db.Topic.findById(req.params.id)
+      .then(topic => {
+        if (!topic) return res.status(400).json({ error: 'no topic with that id' })
+        topic.update({
+          active: req.body.active,
+          content: req.body.content,
+          acronym: req.body.acronym
         })
-        .catch(error => {
-          console.log(error)
-          res.status(500).json({ error: 'database error' })
-        })
-    })
-    .catch(error => {
-      console.log(error)
-      res.status(500).json({ error: 'database error' })
-    })
+          .then(topic => {
+            topic.reload().then(topic => {
+              topic = format(topic)
+              res.status(200).json({ topic })
+            })
+          })
+          .catch(error => {
+            console.log(error)
+            res.status(500).json({ error: 'database error' })
+          })
+      })
+      .catch(error => {
+        console.log(error)
+        res.status(500).json({ error: 'database error' })
+      })
+  }
 })
 
 topicsRouter.get('/', checkAdmin, (req, res) => {
