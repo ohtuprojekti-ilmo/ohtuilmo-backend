@@ -1,3 +1,4 @@
+'use strict'
 module.exports = (sequelize, Sequelize) => {
   const Group = sequelize.define('group', {
     id: {
@@ -12,8 +13,8 @@ module.exports = (sequelize, Sequelize) => {
 
   Group.associate = (models) => {
     Group.hasMany(models.Membership, {
-      foreignKey: 'id',
-      as: 'groups',
+      foreignKey: 'group_id',
+      as: 'Memberships'
     })
   }
 
