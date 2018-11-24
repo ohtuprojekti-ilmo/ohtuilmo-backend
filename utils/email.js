@@ -5,7 +5,7 @@ function sendSecretLink(secretId, address) {
   const options = {
     to: address,
     subject: 'Link to your Software Engineering Project topic submission',
-    html: '<a href="http://svm-45.cs.helsinki.fi:7000/topics/' + secretId + '">Click this link to view or edit your submission</a>'
+    html: '<a href="http://studies.cs.helsinki.fi/projekti/topics/' + secretId + '">Click this link to view or edit your submission</a>'
   }
   send(options)
 }
@@ -24,15 +24,14 @@ function send(options) {
     text: options.text,
     html: options.html
   }
-  if (config.allowSendEmail) {
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error)
-      } else {
-        console.log('sent: ', info)
-      }
-    })
-  }
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error)
+    } else {
+      console.log('sent: ', info)
+    }
+  })
 }
 
 module.exports = {

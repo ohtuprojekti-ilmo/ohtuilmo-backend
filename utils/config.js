@@ -5,9 +5,9 @@ if (process.env.NODE_ENV !== 'production') {
 let port = process.env.PORT
 let dbUrl = process.env.DATABASE_URI
 
-let login = 'http://opetushallinto.cs.helsinki.fi/login'
+let login = 'https://opetushallinto.cs.helsinki.fi/login'
 
-let secret = 'secret'
+let secret = process.env.SECRET
 
 //email config
 let email = {
@@ -16,16 +16,11 @@ let email = {
   port: 587,
   secure: false
 }
-let allowSendEmail = false
-if (process.env.NODE_ENV === 'production') {
-  allowSendEmail = true
-}
 
 module.exports = {
   dbUrl,
   port,
   login,
   secret,
-  email,
-  allowSendEmail
+  email
 }
