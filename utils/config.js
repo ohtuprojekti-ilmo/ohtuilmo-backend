@@ -5,7 +5,7 @@ if (process.env.NODE_ENV !== 'production') {
 let port = process.env.PORT
 let dbUrl = process.env.DATABASE_URI
 
-let login = 'https://opetushallinto.cs.helsinki.fi/login'
+let login = 'http://opetushallinto.cs.helsinki.fi/login'
 
 let secret = process.env.SECRET
 
