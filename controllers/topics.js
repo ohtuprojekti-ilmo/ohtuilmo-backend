@@ -33,7 +33,7 @@ topicsRouter.post('/', (req, res) => {
 })
 
 topicsRouter.put('/:id', (req, res, next) => {
-  //skip admin check if id is secret id
+  //skip admin check if id is secret_id
   if (isSecretId(req.params.id)) res.locals.isSecret = true
   next()
 }, (req, res, next) => {
