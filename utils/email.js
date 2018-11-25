@@ -4,8 +4,10 @@ const nodemailer = require('nodemailer')
 function sendSecretLink(secretId, address) {
   const options = {
     to: address,
-    subject: 'Link to your Software Engineering Project topic submission',
-    html: '<a href="http://studies.cs.helsinki.fi/projekti/topics/' + secretId + '">Click this link to view or edit your submission</a>'
+    subject: '[Software engineering project] project proposal',
+    html:
+      'Thank you for the project proposal. You can use the below link to view or edit your proposal. \n \
+          <a href="http://studies.cs.helsinki.fi/projekti/topics/' + secretId + '">Edit your submission</a>'
   }
   send(options)
 }
