@@ -36,8 +36,8 @@ membershipRouter.post('/', checkLogin, (req, res) => {
                 student_number: req.body.student_number,
                 role: req.body.role
               })
-                .then(group => {
-                  return res.status(200).json({ group })
+                .then(membership => {
+                  return res.status(200).json({ membership })
                 })
                 .catch(error => {
                   console.log(error)
