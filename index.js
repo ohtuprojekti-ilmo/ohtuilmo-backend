@@ -7,10 +7,20 @@ const cors = require('cors')
 // const pg = require('pg')
 const config = require('./utils/config')
 
+var unless = (path, middleware) => {
+  return (req, res, next) => {
+    if (path === req.path) {
+      return next()
+    } else {
+      return middleware(req, res, next)
+    }
+  }
+}
+
 // Middleware
 app.use(cors())
 app.use(bodyParser.json())
-app.use(logger)
+app.use(unless('/api/login', logger))
 
 // Routers
 const loginRouter = require('./controllers/login')
