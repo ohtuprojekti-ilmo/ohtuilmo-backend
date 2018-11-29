@@ -5,8 +5,14 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    content: {
+    preferred_topics: {
       type: Sequelize.JSONB
+    },
+    questions: {
+      type: Sequelize.JSONB
+    },
+    semester: {
+      type: Sequelize.STRING
     }
   })
 

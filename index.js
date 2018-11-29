@@ -4,7 +4,6 @@ const app = express()
 const bodyParser = require('body-parser')
 const logger = require('./utils/middleware/logger')
 const cors = require('cors')
-// const pg = require('pg')
 const config = require('./utils/config')
 
 var unless = (path, middleware) => {
@@ -37,11 +36,6 @@ app.use('/api/topics', topicsRouter)
 app.use('/api/topicDates', topicDatesrouter)
 app.use('/api/tokenCheck', tokenCheckRouter)
 app.use('/api/registrations', registrationRouter)
-
-// Database connection
-// const connectionString = process.env.DATABASE_URI || 'postgres://localhost:5432/todo';
-// const client = new pg.Client(connectionString)
-// client.connect();
 
 // Database connection
 const db = require('./models')
