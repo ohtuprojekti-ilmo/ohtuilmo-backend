@@ -22,6 +22,8 @@ function send(options) {
   const mailOptions = {
     from: config.email.sender,
     to: options.to,
+    replyTo: config.email.replyTo,
+    cc: config.email.cc,
     subject: options.subject,
     text: options.text,
     html: options.html
