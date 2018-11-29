@@ -4,7 +4,7 @@ const checkValidStudentNumber = require('../utils/middleware/routeChecks').check
 
 usersRouter.put('/:student_number', checkValidStudentNumber, (req, res) => {
   if (!req.body.email) return res.status(400).json({ error: 'missing email' })
-  
+
   db.User.findOne({ where: { student_number: req.params.student_number } })
     .then(user => {
       if (!user) return res.status(400).json({ error: 'user does not exist' })
