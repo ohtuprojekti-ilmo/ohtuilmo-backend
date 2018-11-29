@@ -14,7 +14,9 @@ let email = {
   sender: 'Ohtuilmo Robot <noreply@helsinki.fi>',
   host: 'smtp.helsinki.fi',
   port: 587,
-  secure: false
+  secure: false,
+  replyTo: 'mluukkai@cs.helsinki.fi',
+  cc: 'mluukkai@cs.helsinki.fi'
 }
 
 module.exports = {
