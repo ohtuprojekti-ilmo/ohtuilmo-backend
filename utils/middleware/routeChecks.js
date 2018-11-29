@@ -44,7 +44,27 @@ const checkAdmin = (req, res, next) => {
     if (error.name === 'JsonWebTokenError') {
       res.status(401).json({ error: error.message })
     } else {
-      console.log(500)
+      res.status(500).json({ error: error })
+    }
+  }
+}
+
+// checks that token's student number is the same as params student number
+const checkValidStudentNumber = (req, res, next) => {
+  try {
+    const token = getTokenFrom(req)
+    const decodedToken = jwt.verify(token, config.secret)
+
+    if (!token || !decodedToken.id) {
+      return res.status(401).json({ error: 'token missing or invalid' })
+    }
+    if (decodedToken.id !== req.params.student_number) return res.status(401).json({ error: 'student numbers not matching' })
+    return next()
+
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      res.status(401).json({ error: error.message })
+    } else {
       res.status(500).json({ error: error })
     }
   }
@@ -52,5 +72,6 @@ const checkAdmin = (req, res, next) => {
 
 module.exports = {
   checkLogin,
-  checkAdmin
+  checkAdmin,
+  checkValidStudentNumber
 }
