@@ -23,7 +23,7 @@ topicsRouter.post('/', (req, res) => {
     secret_id
   })
     .then(topic => {
-      email.sendSecretLink(topic.secret_id, topic.email)
+      email.sendSecretLink(topic.secret_id, topic.content.email)
       res.status(200).json({ topic })
     })
     .catch(error => {
