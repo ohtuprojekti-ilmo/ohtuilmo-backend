@@ -34,11 +34,11 @@ const updateReviewQuestionSet = (req, res, questionSet) => {
     .catch(error => handleDatabaseError(res, error))
 }
 
-reviewQuestionSetsRouter.post('/', (req, res) => {
+reviewQuestionSetsRouter.post('/', checkAdmin, (req, res) => {
   createReviewQuestionSet(req, res)
 })
 
-reviewQuestionSetsRouter.put('/:id', (req, res) => {
+reviewQuestionSetsRouter.put('/:id', checkAdmin, (req, res) => {
   db.ReviewQuestionSet
     .findOne({ where: { id: req.params.id } })
     .then(foundSet => {
@@ -47,7 +47,7 @@ reviewQuestionSetsRouter.put('/:id', (req, res) => {
     })
 })
 
-reviewQuestionSetsRouter.get('/', (req, res) => {
+reviewQuestionSetsRouter.get('/', checkAdmin, (req, res) => {
   db.ReviewQuestionSet
     .findAll({})
     .then(questionSets => {

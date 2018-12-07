@@ -34,11 +34,11 @@ const updateRegistrationQuestionSet = (req, res, questionSet) => {
     .catch(error => handleDatabaseError(res, error))
 }
 
-registrationQuestionSetsRouter.post('/', (req, res) => {
+registrationQuestionSetsRouter.post('/', checkAdmin, (req, res) => {
   createRegistrationQuestionSet(req, res)
 })
 
-registrationQuestionSetsRouter.put('/:id', (req, res) => {
+registrationQuestionSetsRouter.put('/:id', checkAdmin, (req, res) => {
   db.RegistrationQuestionSet
     .findOne({ where: { id: req.params.id } })
     .then(foundSet => {
@@ -49,7 +49,7 @@ registrationQuestionSetsRouter.put('/:id', (req, res) => {
     )
 })
 
-registrationQuestionSetsRouter.get('/', (req, res) => {
+registrationQuestionSetsRouter.get('/', checkAdmin, (req, res) => {
   db.RegistrationQuestionSet
     .findAll({})
     .then(foundSets => {
