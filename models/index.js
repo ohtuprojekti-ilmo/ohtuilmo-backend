@@ -31,6 +31,9 @@ db.connect = () => {
     const TopicModel = require('./topic')
     const TopicDateModel = require('./topic_date')
     const RegistrationModel = require('./registration')
+    const ConfigurationModel = require('./configuration')
+    const RegistrationQuestionSetModel = require('./registration_question_set')
+    const ReviewQuestionSetModel = require('./review_question_set')
     //const Review = require('./review')
     //const Review_answer = require('./review_answer')
 
@@ -40,6 +43,9 @@ db.connect = () => {
     const Topic = TopicModel(sequelize, Sequelize)
     const TopicDate = TopicDateModel(sequelize, Sequelize)
     const Registration = RegistrationModel(sequelize, Sequelize)
+    const Configuration = ConfigurationModel(sequelize, Sequelize)
+    const RegistrationQuestionSet = RegistrationQuestionSetModel(sequelize, Sequelize)
+    const ReviewQuestionSet = ReviewQuestionSetModel(sequelize, Sequelize)
 
     db.User = User
     db.Group = Group
@@ -47,9 +53,13 @@ db.connect = () => {
     db.Topic = Topic
     db.TopicDate = TopicDate
     db.Registration = Registration
+    db.Configuration = Configuration
+    db.RegistrationQuestionSet = RegistrationQuestionSet
+    db.ReviewQuestionSet = ReviewQuestionSet
 
     db.User.associate(db)
     db.Group.associate(db)
+    db.Configuration.associate(db)
 
     db.sequelize = sequelize
     db.Sequelize = Sequelize
