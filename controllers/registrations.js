@@ -1,29 +1,29 @@
 const registrationsRouter = require('express').Router()
 const db = require('../models/index')
+const config = require('../utils/config')
+const jwt = require('jsonwebtoken')
 const checkLogin = require('../utils/middleware/routeChecks').checkLogin
+const getTokenFrom = require('../utils/middleware/routeChecks').getTokenFrom
+
 
 registrationsRouter.post('/', checkLogin, (req, res) => {
-  if (!req.body.student_number) return res.status(400).json({ error: 'student number is undefined' })
-  if (!req.body.content) return res.status(400).sjon({ error: 'content missing' })
-  db.User.findOne({ where: { student_number: req.body.student_number } })
+  if (!req.body.questions) return res.status(400).json({ error: 'questions missing' })
+  if (!req.body.preferred_topics) return res.status(400).json({ error: 'preferred_topics missing' })
+  const token = getTokenFrom(req)
+  const decodedToken = jwt.verify(token, config.secret)
+  const loggedInUserStudentNumber = decodedToken.id
+
+  db.User.findOne({ where: { student_number: loggedInUserStudentNumber } })
     .then(user => {
       if (!user) return res.status(400).json({ error: 'student not found' })
 
-      db.Registration.findOne({ where: { student_number: req.body.student_number } })
-        .then((foundRegistration) => {
-          if (foundRegistration) return res.status(400).json({ error: 'student is already registered' })
-
-          db.Registration.create({
-            student_number: req.body.student_number,
-            content: req.body.content
-          })
-            .then(registration => {
-              res.status(200).json({ registration })
-            })
-            .catch(error => {
-              console.log(error)
-              res.status(500).json({ error: 'database error' })
-            })
+      db.Registration.create({
+        student_number: loggedInUserStudentNumber,
+        preferred_topics: req.body.preferred_topics,
+        questions: req.body.questions
+      })
+        .then(registration => {
+          res.status(200).json({ registration })
         })
         .catch(error => {
           console.log(error)
