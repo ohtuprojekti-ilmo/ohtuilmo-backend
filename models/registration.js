@@ -10,9 +10,6 @@ module.exports = (sequelize, Sequelize) => {
     },
     questions: {
       type: Sequelize.JSONB
-    },
-    semester: {
-      type: Sequelize.STRING
     }
   })
 
