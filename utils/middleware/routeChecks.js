@@ -49,7 +49,7 @@ const checkAdmin = (req, res, next) => {
   }
 }
 
-// checks that token's student number is the same as params student number
+// checks that token's student number is the same as req.params.student_number
 const checkValidStudentNumber = (req, res, next) => {
   try {
     const token = getTokenFrom(req)
@@ -73,5 +73,6 @@ const checkValidStudentNumber = (req, res, next) => {
 module.exports = {
   checkLogin,
   checkAdmin,
-  checkValidStudentNumber
+  checkValidStudentNumber,
+  getTokenFrom
 }
