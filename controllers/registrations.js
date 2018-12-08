@@ -3,8 +3,13 @@ const db = require('../models/index')
 const config = require('../utils/config')
 const jwt = require('jsonwebtoken')
 const checkLogin = require('../utils/middleware/routeChecks').checkLogin
+const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
 const getTokenFrom = require('../utils/middleware/routeChecks').getTokenFrom
 
+const handleDatabaseError = (res, error) => {
+  console.log(error)
+  res.status(500).json({ error: 'database error' })
+}
 
 registrationsRouter.post('/', checkLogin, (req, res) => {
   if (!req.body.questions) return res.status(400).json({ error: 'questions missing' })
@@ -17,23 +22,38 @@ registrationsRouter.post('/', checkLogin, (req, res) => {
     .then(user => {
       if (!user) return res.status(400).json({ error: 'student not found' })
 
-      db.Registration.create({
-        student_number: loggedInUserStudentNumber,
-        preferred_topics: req.body.preferred_topics,
-        questions: req.body.questions
-      })
-        .then(registration => {
-          res.status(200).json({ registration })
+      db.Configuration.findOne({ where: { active: true } })
+        .then(config => {
+          if (!config) return res.status(400).json({ error: 'no active configuration found' })
+
+          db.Registration.create({
+            student_number: loggedInUserStudentNumber,
+            preferred_topics: req.body.preferred_topics,
+            questions: req.body.questions,
+            configuration_id: config.id
+          })
+            .then(registration => {
+              res.status(200).json({ registration })
+            })
+            .catch(error => handleDatabaseError(res, error))
         })
-        .catch(error => {
-          console.log(error)
-          res.status(500).json({ error: 'database error' })
+        .catch(error => handleDatabaseError(res, error))
+    })
+    .catch(error => handleDatabaseError(res, error))
+})
+
+registrationsRouter.get('/current', checkAdmin, (req, res) => {
+  db.Configuration.findOne({ where: { active: true } })
+    .then(config => {
+      if (!config) return res.status(400).json({ error: 'no active configuration found' })
+
+      config.getRegistrations()
+        .then(registrations => {
+          res.status(200).json({ registrations })
         })
+        .catch(error => handleDatabaseError(res, error))
     })
-    .catch(error => {
-      console.log(error)
-      res.status(500).json({ error: 'database error' })
-    })
+    .catch(error => handleDatabaseError(res, error))
 })
 
 module.exports = registrationsRouter
