@@ -4,7 +4,7 @@ const checkLogin = require('../utils/middleware/routeChecks').checkLogin
 
 registrationsRouter.post('/', checkLogin, (req, res) => {
   if (!req.body.student_number) return res.status(400).json({ error: 'student number is undefined' })
-  if (!req.body.content) return res.status(400).sjon({ error: 'content missing' })
+  if (!req.body.content) return res.status(400).json({ error: 'content missing' })
   db.User.findOne({ where: { student_number: req.body.student_number } })
     .then(user => {
       if (!user) return res.status(400).json({ error: 'student not found' })
