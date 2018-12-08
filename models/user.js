@@ -28,9 +28,9 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'student_number',
       as: 'Memberships'
     })
-    User.hasOne(models.Registration, {
+    User.hasMany(models.Registration, {
       foreignKey: 'student_number',
-      as: 'Registration'
+      as: 'Registrations'
     })
     // User.hasOne(models.Review_answer, {
     //   foreignKey: 'id',
