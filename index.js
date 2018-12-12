@@ -33,6 +33,7 @@ const usersRouter = require('./controllers/users')
 const configurationsRouter = require('./controllers/configurations')
 const registrationQuestionSetsRouter = require('./controllers/registrationQuestionSets')
 const reviewQuestionSetsRouter = require('./controllers/reviewQuestionSets')
+const emailRouter = require('./controllers/email').emailRouter
 app.use('/api/login', loginRouter)
 app.use('/api/groups', groupsRouter)
 app.use('/api/memberships', membershipRouter)
@@ -44,6 +45,7 @@ app.use('/api/users', usersRouter)
 app.use('/api/configurations', configurationsRouter)
 app.use('/api/registrationQuestions', registrationQuestionSetsRouter)
 app.use('/api/reviewQuestions', reviewQuestionSetsRouter)
+app.use('/api/email', emailRouter)
 
 // Database connection
 const db = require('./models')

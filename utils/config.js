@@ -20,20 +20,20 @@ let email = {
     cc: 'mluukkai@cs.helsinki.fi'
   },
   acceptEng: {
-    subject: '',
-    html: ''
+    subject: 'acceptEng test',
+    html: '<h1>test</h1>'
   },
   rejectEng: {
-    subject: '',
-    html: ''
+    subject: 'rejectEng test',
+    html: '<h1>test</h1>'
   },
   acceptFin: {
-    subject: '',
-    html: ''
+    subject: 'acceptFin testi',
+    html: '<h1>testi</h1>'
   },
   rejectFin: {
-    subject: '',
-    html: ''
+    subject: 'rejectFin testi',
+    html: '<h1>testi</h1>'
   }
 }
 

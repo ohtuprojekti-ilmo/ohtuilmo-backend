@@ -1,8 +1,7 @@
 const emailRouter = require('express').Router()
 const nodemailer = require('nodemailer')
 const db = require('../models/index')
-
-let config = {}
+let config = require('../utils/config').email
 
 const checkConfiguration = () => {
   db.Configuration
@@ -92,31 +91,31 @@ const send = (options) => {
 
 emailRouter.post('/send', (req, res) => {
   if (!checkConfiguration()) {
-    res.status(503).json({ error: 'no valid configuration, cannot send' })
+    console.log('Warning, sending email using default configuration')
   }
   switch (req.body.messageType) {
-    case 'acceptEng':
-      sendAcceptEng(req.body.address)
-      res.status(200).json({ message: 'sending email' })
-      break
-    case 'rejectEng':
-      sendRejectEng(req.body.address)
-      res.status(200).json({ message: 'sending email' })
-      break
-    case 'acceptFin':
-      sendAcceptFin(req.body.address)
-      res.status(200).json({ message: 'sending email' })
-      break
-    case 'rejectFin':
-      sendRejectFin(req.body.address)
-      res.status(200).json({ message: 'sending email' })
-      break
-    default:
-      res.status(401).json({ error: 'unknown message type requested ' })
-      break
+  case 'acceptEng':
+    sendAcceptEng(req.body.address)
+    res.status(200).json({ message: 'sending email' })
+    break
+  case 'rejectEng':
+    sendRejectEng(req.body.address)
+    res.status(200).json({ message: 'sending email' })
+    break
+  case 'acceptFin':
+    sendAcceptFin(req.body.address)
+    res.status(200).json({ message: 'sending email' })
+    break
+  case 'rejectFin':
+    sendRejectFin(req.body.address)
+    res.status(200).json({ message: 'sending email' })
+    break
+  default:
+    res.status(401).json({ error: 'unknown message type requested ' })
+    break
   }
 })
 
 module.exports = {
-  sendSecretLink, sendAcceptEng, sendRejectEng, sendAcceptFin, sendRejectFin
+  emailRouter, sendSecretLink
 }
