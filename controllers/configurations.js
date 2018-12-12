@@ -66,7 +66,7 @@ const createConfiguration = (req, res) => {
 const updateConfiguration = (req, res, configuration) => {
   configuration
     .update({
-      name: req.body.active,
+      name: req.body.name,
       content: req.body.content,
       active: req.body.active
     })
