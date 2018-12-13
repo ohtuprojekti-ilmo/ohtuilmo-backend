@@ -24,25 +24,20 @@ const returnPopulatedConfiguration = (req, res, unPopulatedConfiguration) => {
 const setForeignKeys = async (configuration, req, res) => {
   try {
     if (req.body.review_question_set_1_id) {
-      db.ReviewQuestionSet.findOne({ where: { id: req.body.review_question_set_1_id } })
-        .then(async foundSet => {
-          if (!foundSet) return res.status(400).json({ error: 'no review question set with that id' })
-          await configuration.setReview_question_set_1(req.body.review_question_set_1_id)
-        })
+      const foundSet = await db.ReviewQuestionSet.findOne({ where: { id: req.body.review_question_set_1_id } })
+      if (!foundSet) return res.status(400).json({ error: 'no review question set with that id' })
+      await configuration.setReview_question_set_1(req.body.review_question_set_1_id)
     }
     if (req.body.review_question_set_2_id) {
-      db.ReviewQuestionSet.findOne({ where: { id: req.body.review_question_set_2_id } })
-        .then(async foundSet => {
-          if (!foundSet) return res.status(400).json({ error: 'no review question set with that id' })
-          await configuration.setReview_question_set_2(req.body.review_question_set_2_id)
-        })
+      const foundSet = await db.ReviewQuestionSet.findOne({ where: { id: req.body.review_question_set_2_id } })
+      if (!foundSet) return res.status(400).json({ error: 'no review question set with that id' })
+      await configuration.setReview_question_set_2(req.body.review_question_set_2_id)
+
     }
     if (req.body.registration_question_set_id) {
-      db.RegistrationQuestionSet.findOne({ where: { id: req.body.registration_question_set_id } })
-        .then(async foundSet => {
-          if (!foundSet) return res.status(400).json({ error: 'no registration question set with that id' })
-          await configuration.setRegistration_question_set(req.body.registration_question_set_id)
-        })
+      const foundSet = await db.RegistrationQuestionSet.findOne({ where: { id: req.body.registration_question_set_id } })
+      if (!foundSet) return res.status(400).json({ error: 'no registration question set with that id' })
+      await configuration.setRegistration_question_set(req.body.registration_question_set_id)
     }
     returnPopulatedConfiguration(req, res, configuration)
   } catch (error) {
