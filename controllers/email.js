@@ -1,20 +1,6 @@
 const emailRouter = require('express').Router()
 const nodemailer = require('nodemailer')
-const db = require('../models/index')
-let config = require('../utils/config').email
-
-const checkConfiguration = () => {
-  db.Configuration
-    .findOne({ where: { active: true } })
-    .then(activeConfig => {
-      if (!activeConfig || !activeConfig.content.email) {
-        return false
-      } else {
-        config = activeConfig.content.email
-        return true
-      }
-    })
-}
+const config = require('../utils/config').email
 
 const sendSecretLink = (secretId, address) => {
   const options = {
@@ -80,19 +66,19 @@ const send = (options) => {
     html: options.html
   }
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error)
-    } else {
-      console.log('sent: ', info)
-    }
-  })
+  if (process.env.NODE_ENV === 'PRODUCTION') {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error)
+      } else {
+        console.log('sent: ', info)
+      }
+    })
+  }
 }
 
 emailRouter.post('/send', (req, res) => {
-  if (!checkConfiguration()) {
-    console.log('Warning, sending email using default configuration')
-  }
+
   switch (req.body.messageType) {
   case 'acceptEng':
     sendAcceptEng(req.body.address)
