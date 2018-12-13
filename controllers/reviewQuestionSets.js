@@ -47,11 +47,11 @@ const createChecks = (req, res) => {
 
 const updateChecks = (req, res) => {
   if (isNaN(req.params.id)) return res.status(400).json({ error: 'invalid id' })
-  if (!req.body.id) return res.status(400).json({ error: 'name undefined' })
+  if (!req.body.name) return res.status(400).json({ error: 'name undefined' })
   db.ReviewQuestionSet
     .findOne({ where: { name: req.body.name } })
     .then(duplicateNameSet => {
-      if (duplicateNameSet) return res.status(400).json({ error: 'name already in use' })
+      if (duplicateNameSet && (duplicateNameSet.id !== parseInt(req.params.id))) return res.status(400).json({ error: 'name already in use' })
       db.ReviewQuestionSet
         .findOne({ where: { id: req.params.id } })
         .then(foundSet => {
