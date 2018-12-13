@@ -10,9 +10,9 @@ const handleDatabaseError = (res, error) => {
   res.status(500).json({ error: 'database error' })
 }
 
-const returnPopulatedConfiguration = (req, res, configuration) => {
+const returnPopulatedConfiguration = (req, res, unPopulatedConfiguration) => {
   db.Configuration.findOne({
-    where: { id: configuration.id },
+    where: { id: unPopulatedConfiguration.id },
     include: includeArray
   })
     .then(foundConfiguration => {
@@ -28,7 +28,6 @@ const setForeignKeys = async (configuration, req, res) => {
         .then(async foundSet => {
           if (!foundSet) return res.status(400).json({ error: 'no review question set with that id' })
           await configuration.setReview_question_set_1(req.body.review_question_set_1_id)
-          res.status(200).json({ configuration })
         })
     }
     if (req.body.review_question_set_2_id) {
@@ -36,7 +35,6 @@ const setForeignKeys = async (configuration, req, res) => {
         .then(async foundSet => {
           if (!foundSet) return res.status(400).json({ error: 'no review question set with that id' })
           await configuration.setReview_question_set_2(req.body.review_question_set_2_id)
-          res.status(200).json({ configuration })
         })
     }
     if (req.body.registration_question_set_id) {
@@ -44,7 +42,6 @@ const setForeignKeys = async (configuration, req, res) => {
         .then(async foundSet => {
           if (!foundSet) return res.status(400).json({ error: 'no registration question set with that id' })
           await configuration.setRegistration_question_set(req.body.review_question_set_1_id)
-          res.status(200).json({ configuration })
         })
     }
     returnPopulatedConfiguration(req, res, configuration)
@@ -74,39 +71,57 @@ const updateConfiguration = (req, res, configuration) => {
     .catch(error => handleDatabaseError(res, error))
 }
 
+const createChecks = (req, res) => {
+  if (!req.body.name) return res.status(400).json({ error: 'name undefined' })
+  db.Configuration
+    .findOne({ where: { name: req.body.name } })
+    .then(foundSet => {
+      if (foundSet) return res.status(400).json({ error: 'name already in use' })
+      if (req.body.active === true) {
+        // make previous active configuration inactive
+        db.Configuration.update({ active: false }, { where: { active: true } })
+          .then(() => createConfiguration(req, res))
+          .catch(error => handleDatabaseError(res, error))
+      } else {
+        createConfiguration(req, res)
+      }
+    })
+    .catch(error => handleDatabaseError(res, error))
+}
+
+const updateChecks = (req, res) => {
+  if (isNaN(req.params.id)) return res.status(400).json({ error: 'invalid id' })
+  if (!req.body.name) return res.status(400).json({ error: 'name undefined' })
+  db.Configuration
+    .findOne({ where: { name: req.body.name } })
+    .then(duplicateNameConfiguration => {
+      if (duplicateNameConfiguration && (duplicateNameConfiguration.id !== parseInt(req.params.id))) {
+        return res.status(400).json({ error: 'name already in use' })
+      }
+      db.Configuration
+        .findOne({ where: { id: req.params.id } })
+        .then(foundConfiguration => {
+          if (!foundConfiguration) return res.status(400).json({ error: 'no review question set with that id' })
+          if (req.body.active === true) {
+            // make previous active configuration inactive
+            db.Configuration.update({ active: false }, { where: { active: true } })
+              .then(() => {
+                updateConfiguration(req, res, foundConfiguration)
+              })
+              .catch(error => handleDatabaseError(res, error))
+          } else {
+            updateConfiguration(req, res, foundConfiguration)
+          }
+        })
+    })
+}
+
 configurationsRouter.post('/', checkAdmin, (req, res) => {
-  if (!req.body.name) {
-    return res.status(400).json({ error: 'configuration name undefined' })
-  }
-  if (req.body.active === true) {
-    // make previous active configuration inactive
-    db.Configuration.update({ active: false }, { where: { active: true } })
-      .then(() => createConfiguration(req, res))
-      .catch(error => handleDatabaseError(res, error))
-  } else {
-    createConfiguration(req, res)
-  }
+  createChecks(req, res)
 })
 
 configurationsRouter.put('/:id', checkAdmin, (req, res) => {
-  db.Configuration.findOne({ where: { id: req.params.id } }).then(configuration => {
-    if (!configuration) {
-      return res.status(400).json({ error: 'no configuration with that id' })
-    }
-    if (!req.body.name) {
-      return res.status(400).json({ error: 'configuration name undefined' })
-    }
-    if (req.body.active === true) {
-      // make previous active configuration inactive
-      db.Configuration.update({ active: false }, { where: { active: true } })
-        .then(() => {
-          updateConfiguration(req, res, configuration)
-        })
-        .catch(error => handleDatabaseError(res, error))
-    } else {
-      updateConfiguration(req, res, configuration)
-    }
-  })
+  updateChecks(req, res)
 })
 
 configurationsRouter.get('/', checkAdmin, (req, res) => {
