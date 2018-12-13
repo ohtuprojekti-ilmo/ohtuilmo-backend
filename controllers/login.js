@@ -25,18 +25,20 @@ const handleDatabaseError = (res, error) => {
 
 const returnRegisteredUser = (req, res, user) => {
   const token = jwt.sign({ id: user.student_number, admin: user.admin }, config.secret)
+  user.registered = true
   return res.status(200).json({
     token,
-    user: { ...user, registered: true }
+    user
   })
 }
 
 
 const returnNotRegisteredUser = (req, res, user) => {
   const token = jwt.sign({ id: user.student_number, admin: user.admin }, config.secret)
+  user.registered = false
   return res.status(200).json({
     token,
-    user: { ...user, registered: false }
+    user
   })
 }
 
@@ -83,22 +85,23 @@ loginRouter.post('/', async (req, res) => {
       if (foundUser) {
         //user already in database, no need to add
         checkUserRegistrationState(req, res, foundUser)
+      } else {
+        //user not in database, add user
+        db.User
+          .create({
+            username: authenticatedUser.username,
+            student_number: authenticatedUser.student_number,
+            first_names: authenticatedUser.first_names,
+            last_name: authenticatedUser.last_name,
+            email: null,
+            admin: false
+          })
+          .then(savedUser => {
+            //redundant check since user was just created
+            checkUserRegistrationState(req, res, savedUser)
+          })
+          .catch(error => handleDatabaseError(res, error))
       }
-      //user not in database, add user
-      db.User
-        .create({
-          username: authenticatedUser.username,
-          student_number: authenticatedUser.student_number,
-          first_names: authenticatedUser.first_names,
-          last_name: authenticatedUser.last_name,
-          email: null,
-          admin: false
-        })
-        .then(savedUser => {
-          //redundant check since user was just created
-          checkUserRegistrationState(req, res, savedUser)
-        })
-        .catch(error => handleDatabaseError(res, error))
     })
     .catch(error => handleDatabaseError(res, error))
 })
