@@ -1,7 +1,7 @@
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
 const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
-const email = require('../utils/email')
+const email = require('./email')
 const getRandomId = require('../utils/idGeneration').getRandomId
 
 const format = (topic) => {
