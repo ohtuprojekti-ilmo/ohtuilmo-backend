@@ -23,17 +23,29 @@ const returnPopulatedConfiguration = (req, res, configuration) => {
 
 const setForeignKeys = async (configuration, req, res) => {
   try {
-    if (req.body.registrations) {
-      await configuration.setRegistrations(req.body.registrations)
+    if (req.body.review_question_set_1_id) {
+      db.ReviewQuestionSet.findOne({ where: { id: req.body.review_question_set_1_id } })
+        .then(async foundSet => {
+          if (!foundSet) return res.status(400).json({ error: 'no review question set with that id' })
+          await configuration.setReview_question_set_1(req.body.review_question_set_1_id)
+          res.status(200).json({ configuration })
+        })
     }
-    if (req.body.review_question_set_1) {
-      await configuration.setReview_question_set_1(req.body.review_question_set_1)
+    if (req.body.review_question_set_2_id) {
+      db.ReviewQuestionSet.findOne({ where: { id: req.body.review_question_set_2_id } })
+        .then(async foundSet => {
+          if (!foundSet) return res.status(400).json({ error: 'no review question set with that id' })
+          await configuration.setReview_question_set_2(req.body.review_question_set_2_id)
+          res.status(200).json({ configuration })
+        })
     }
-    if (req.body.review_question_set_2) {
-      await configuration.setReview_question_set_2(req.body.review_question_set_2)
-    }
-    if (req.body.registration_question_set) {
-      await configuration.setRegistration_question_set(req.body.registration_question_set)
+    if (req.body.registration_question_set_id) {
+      db.RegistrationQuestionSet.findOne({ where: { id: req.body.registration_question_set_id } })
+        .then(async foundSet => {
+          if (!foundSet) return res.status(400).json({ error: 'no registration question set with that id' })
+          await configuration.setRegistration_question_set(req.body.review_question_set_1_id)
+          res.status(200).json({ configuration })
+        })
     }
     returnPopulatedConfiguration(req, res, configuration)
   } catch (error) {
@@ -54,7 +66,7 @@ const createConfiguration = (req, res) => {
 const updateConfiguration = (req, res, configuration) => {
   configuration
     .update({
-      name: req.body.active,
+      name: req.body.name,
       content: req.body.content,
       active: req.body.active
     })
@@ -66,7 +78,7 @@ configurationsRouter.post('/', checkAdmin, (req, res) => {
   if (!req.body.name) {
     return res.status(400).json({ error: 'configuration name undefined' })
   }
-  if (req.body.active) {
+  if (req.body.active === true) {
     // make previous active configuration inactive
     db.Configuration.update({ active: false }, { where: { active: true } })
       .then(() => createConfiguration(req, res))
@@ -81,7 +93,10 @@ configurationsRouter.put('/:id', checkAdmin, (req, res) => {
     if (!configuration) {
       return res.status(400).json({ error: 'no configuration with that id' })
     }
-    if (req.body.active) {
+    if (!req.body.name) {
+      return res.status(400).json({ error: 'configuration name undefined' })
+    }
+    if (req.body.active === true) {
       // make previous active configuration inactive
       db.Configuration.update({ active: false }, { where: { active: true } })
         .then(() => {
