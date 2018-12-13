@@ -25,17 +25,21 @@ registrationsRouter.post('/', checkLogin, (req, res) => {
       db.Configuration.findOne({ where: { active: true } })
         .then(config => {
           if (!config) return res.status(400).json({ error: 'no active configuration found' })
-
-          db.Registration.create({
-            student_number: loggedInUserStudentNumber,
-            preferred_topics: req.body.preferred_topics,
-            questions: req.body.questions,
-            configuration_id: config.id
-          })
-            .then(registration => {
-              res.status(200).json({ registration })
+          db.Registration.findAll({ where: { configuration_id: config.id } })
+            .then(registrations => {
+              const existingRegistration = registrations.find(e => e.student_number === loggedInUserStudentNumber)
+              if (existingRegistration) return res.status(400).json({ error: 'student already registered' })
+              db.Registration.create({
+                student_number: loggedInUserStudentNumber,
+                preferred_topics: req.body.preferred_topics,
+                questions: req.body.questions,
+                configuration_id: config.id
+              })
+                .then(registration => {
+                  res.status(200).json({ registration })
+                })
+                .catch(error => handleDatabaseError(res, error))
             })
-            .catch(error => handleDatabaseError(res, error))
         })
         .catch(error => handleDatabaseError(res, error))
     })
