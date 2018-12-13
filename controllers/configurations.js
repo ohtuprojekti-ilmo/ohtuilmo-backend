@@ -41,7 +41,7 @@ const setForeignKeys = async (configuration, req, res) => {
       db.RegistrationQuestionSet.findOne({ where: { id: req.body.registration_question_set_id } })
         .then(async foundSet => {
           if (!foundSet) return res.status(400).json({ error: 'no registration question set with that id' })
-          await configuration.setRegistration_question_set(req.body.review_question_set_1_id)
+          await configuration.setRegistration_question_set(req.body.registration_question_set_id)
         })
     }
     returnPopulatedConfiguration(req, res, configuration)
