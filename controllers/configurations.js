@@ -101,7 +101,10 @@ const updateChecks = (req, res) => {
             // make previous active configuration inactive
             db.Configuration.update({ active: false }, { where: { active: true } })
               .then(() => {
-                updateConfiguration(req, res, foundConfiguration)
+                // selected conf might be affected, reload
+                foundConfiguration
+                  .reload()
+                  .then(reloaded => updateConfiguration(req, res, reloaded))
               })
               .catch(error => handleDatabaseError(res, error))
           } else {
