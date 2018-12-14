@@ -28,13 +28,6 @@ module.exports = (sequelize, Sequelize) => {
       foreignKey: 'student_number',
       as: 'Memberships'
     })
-    User.hasMany(models.Registration, {
-      foreignKey: 'student_number',
-      as: 'Registrations'
-    })
-    // User.hasOne(models.Review_answer, {
-    //   foreignKey: 'id',
-    // })
   }
 
   return User

@@ -23,43 +23,6 @@ const handleDatabaseError = (res, error) => {
   res.status(500).json({ error: 'database error' })
 }
 
-const returnRegisteredUser = (req, res, user) => {
-  const token = jwt.sign({ id: user.student_number, admin: user.admin }, config.secret)
-  user.registered = true
-  return res.status(200).json({
-    token,
-    user
-  })
-}
-
-
-const returnNotRegisteredUser = (req, res, user) => {
-  const token = jwt.sign({ id: user.student_number, admin: user.admin }, config.secret)
-  user.registered = false
-  return res.status(200).json({
-    token,
-    user
-  })
-}
-
-const checkUserRegistrationState = (req, res, user) => {
-  db.Configuration.findOne({ where: { active: true } })
-    .then(foundConfiguration => {
-      if (!foundConfiguration) {
-        return returnNotRegisteredUser(req, res, user)
-      }
-      db.Registration.findOne({ where: { configuration_id: foundConfiguration.id, student_number: user.student_number } })
-        .then(foundRegistration => {
-          if (!foundRegistration) {
-            return returnNotRegisteredUser(req, res, user)
-          }
-          returnRegisteredUser(req, res, user)
-        })
-        .catch(error => handleDatabaseError(res, error))
-    })
-    .catch(error => handleDatabaseError(res, error))
-}
-
 loginRouter.post('/', async (req, res) => {
 
   if (!req.body.username || !req.body.password) {
@@ -84,7 +47,11 @@ loginRouter.post('/', async (req, res) => {
     .then(foundUser => {
       if (foundUser) {
         //user already in database, no need to add
-        checkUserRegistrationState(req, res, foundUser)
+        const token = jwt.sign({ id: foundUser.student_number, admin: foundUser.admin }, config.secret)
+        return res.status(200).json({
+          token,
+          user: foundUser
+        })
       } else {
         //user not in database, add user
         db.User
@@ -97,8 +64,11 @@ loginRouter.post('/', async (req, res) => {
             admin: false
           })
           .then(savedUser => {
-            //redundant check since user was just created
-            checkUserRegistrationState(req, res, savedUser)
+            const token = jwt.sign({ id: savedUser.student_number, admin: savedUser.admin }, config.secret)
+            return res.status(200).json({
+              token,
+              user: savedUser
+            })
           })
           .catch(error => handleDatabaseError(res, error))
       }
