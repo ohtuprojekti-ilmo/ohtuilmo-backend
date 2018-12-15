@@ -27,7 +27,7 @@ registrationsRouter.post('/', checkLogin, (req, res) => {
           if (!config) return res.status(400).json({ error: 'no active configuration found' })
           db.Registration.findAll({ where: { configuration_id: config.id } })
             .then(registrations => {
-              const existingRegistration = registrations.find(e => e.student_number === loggedInUserStudentNumber)
+              const existingRegistration = registrations.find(e => e.studentStudentNumber === loggedInUserStudentNumber)
               if (existingRegistration) return res.status(400).json({ error: 'student already registered' })
               db.Registration.create({
                 preferred_topics: req.body.preferred_topics,
