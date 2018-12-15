@@ -13,5 +13,11 @@ module.exports = (sequelize, Sequelize) => {
     }
   })
 
+  Registration.associate = (models) => {
+    Registration.belongsTo(models.User, {
+      as: 'student'
+    })
+  }
+
   return Registration
 }

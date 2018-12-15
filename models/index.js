@@ -60,6 +60,7 @@ db.connect = () => {
     db.User.associate(db)
     db.Group.associate(db)
     db.Configuration.associate(db)
+    db.Registration.associate(db)
 
     db.sequelize = sequelize
     db.Sequelize = Sequelize

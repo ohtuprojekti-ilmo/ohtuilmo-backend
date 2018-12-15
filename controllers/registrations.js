@@ -27,15 +27,15 @@ registrationsRouter.post('/', checkLogin, (req, res) => {
           if (!config) return res.status(400).json({ error: 'no active configuration found' })
           db.Registration.findAll({ where: { configuration_id: config.id } })
             .then(registrations => {
-              const existingRegistration = registrations.find(e => e.student_number === loggedInUserStudentNumber)
+              const existingRegistration = registrations.find(e => e.studentStudentNumber === loggedInUserStudentNumber)
               if (existingRegistration) return res.status(400).json({ error: 'student already registered' })
               db.Registration.create({
-                student_number: loggedInUserStudentNumber,
                 preferred_topics: req.body.preferred_topics,
                 questions: req.body.questions,
                 configuration_id: config.id
               })
-                .then(registration => {
+                .then(async registration => {
+                  try { await registration.setStudent(loggedInUserStudentNumber) } catch (error) { handleDatabaseError(res, error) }
                   res.status(200).json({ registration })
                 })
                 .catch(error => handleDatabaseError(res, error))
@@ -51,11 +51,17 @@ registrationsRouter.get('/current', checkAdmin, (req, res) => {
     .then(config => {
       if (!config) return res.status(400).json({ error: 'no active configuration found' })
 
-      config.getRegistrations()
+      db.Registration
+        .findAll({ where: { configuration_id: config.id }, include: ['student'] })
         .then(registrations => {
           res.status(200).json({ registrations })
         })
         .catch(error => handleDatabaseError(res, error))
+      // config.getRegistrations()
+      //   .then(registrations => {
+      //     res.status(200).json({ registrations })
+      //   })
+      //   .catch(error => handleDatabaseError(res, error))
     })
     .catch(error => handleDatabaseError(res, error))
 })
