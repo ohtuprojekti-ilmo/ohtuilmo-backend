@@ -2,8 +2,8 @@ const config = require('../config')
 const jwt = require('jsonwebtoken')
 
 const getTokenFrom = (request) => {
-  const authorization = request.headers.authorization
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+  const authorization = request.headers.authorization || request.query.token
+  if (authorization && authorization.toLowerCase().startsWith('bearer')) {
     return authorization.substring(7)
   }
   return null

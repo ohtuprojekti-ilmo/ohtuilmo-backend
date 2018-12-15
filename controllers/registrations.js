@@ -47,6 +47,25 @@ registrationsRouter.post('/', checkLogin, (req, res) => {
 })
 
 registrationsRouter.get('/current', checkAdmin, (req, res) => {
+  const formatJson = (registration) => {
+    registration.preferred_topics.forEach(topic => {
+      delete topic.content.description
+      delete topic.content.environment
+      delete topic.content.additionalInfo
+      delete topic.content.specialRequests
+      delete topic.createdAt
+      delete topic.updatedAt
+    })
+
+    return {
+      student_number: registration.studentStudentNumber,
+      last_name: registration.student.last_name,
+      first_names: registration.student.first_names,
+      preferred_topics: registration.preferred_topics,
+      questions: registration.questions
+    }
+  }
+
   db.Configuration.findOne({ where: { active: true } })
     .then(config => {
       if (!config) return res.status(400).json({ error: 'no active configuration found' })
@@ -54,7 +73,7 @@ registrationsRouter.get('/current', checkAdmin, (req, res) => {
       db.Registration
         .findAll({ where: { configuration_id: config.id }, include: ['student'] })
         .then(registrations => {
-          res.status(200).json({ registrations })
+          res.status(200).json({ registrations: registrations.map(formatJson) })
         })
         .catch(error => handleDatabaseError(res, error))
       // config.getRegistrations()

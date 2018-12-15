@@ -3,6 +3,7 @@ const db = require('../models/index')
 const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
 const email = require('./email')
 const getRandomId = require('../utils/idGeneration').getRandomId
+const shuffle = require('shuffle-array')
 
 const format = (topic) => {
   let formatted = topic
@@ -99,8 +100,9 @@ topicsRouter.put('/:id', (req, res, next) => {
 topicsRouter.get('/', checkAdmin, (req, res) => {
   db.Topic.findAll({})
     .then(topics => {
-      topics = topics.map(topic => format(topic))
-      res.status(200).json({ topics })
+      res.status(200).json({ topics:
+        shuffle(topics.map(topic => format(topic)))
+      })
     })
     .catch(error => {
       console.log(error)
