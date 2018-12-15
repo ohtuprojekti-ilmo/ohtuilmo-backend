@@ -73,7 +73,10 @@ registrationsRouter.get('/current', checkAdmin, (req, res) => {
       db.Registration
         .findAll({ where: { configuration_id: config.id }, include: ['student'] })
         .then(registrations => {
-          res.status(200).json({ registrations: registrations.map(formatJson) })
+          res.status(200).json({
+            registrationCount: registrations.length,
+            registrations: registrations.map(formatJson)
+          })
         })
         .catch(error => handleDatabaseError(res, error))
       // config.getRegistrations()
