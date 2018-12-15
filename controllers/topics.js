@@ -117,8 +117,10 @@ topicsRouter.get('/active', (req, res) => {
     }
   })
     .then(topics => {
-      topics = topics.map(topic => format(topic))
-      res.status(200).json({ topics })
+      res.status(200).json({
+        topics:
+          shuffle(topics.map(topic => format(topic)))
+      })
     })
     .catch(error => {
       console.log(error)
