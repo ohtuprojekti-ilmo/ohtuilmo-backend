@@ -61,6 +61,7 @@ registrationsRouter.get('/current', checkAdmin, (req, res) => {
       student_number: registration.studentStudentNumber,
       last_name: registration.student.last_name,
       first_names: registration.student.first_names,
+      email: registration.student.email,
       preferred_topics: registration.preferred_topics,
       questions: registration.questions
     }
