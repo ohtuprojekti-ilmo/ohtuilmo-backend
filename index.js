@@ -34,6 +34,7 @@ const configurationsRouter = require('./controllers/configurations')
 const registrationQuestionSetsRouter = require('./controllers/registrationQuestionSets')
 const reviewQuestionSetsRouter = require('./controllers/reviewQuestionSets')
 const emailRouter = require('./controllers/email').emailRouter
+const registrationManagementRouter = require('./controllers/registrationManagement')
 app.use('/api/login', loginRouter)
 app.use('/api/groups', groupsRouter)
 app.use('/api/memberships', membershipRouter)
@@ -46,6 +47,7 @@ app.use('/api/configurations', configurationsRouter)
 app.use('/api/registrationQuestions', registrationQuestionSetsRouter)
 app.use('/api/reviewQuestions', reviewQuestionSetsRouter)
 app.use('/api/email', emailRouter)
+app.use('/api/registrationManagement', registrationManagementRouter)
 
 // Database connection
 const db = require('./models')
@@ -60,9 +62,10 @@ server.listen(PORT, () => {
 
 server.on('close', () => {
   // Close database connection
-  db.sequelize.close()
+  db.sequelize
+    .close()
     .then(() => console.log('client has disconnected'))
-    .catch(err => console.error('error during disconnection', err.stack))
+    .catch((err) => console.error('error during disconnection', err.stack))
 })
 
 module.exports = {

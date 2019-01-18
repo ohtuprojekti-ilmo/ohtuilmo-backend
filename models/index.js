@@ -14,7 +14,7 @@ db.connect = () => {
       .then(() => {
         console.log('Connection has been established successfully.')
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Unable to connect to the database:', err)
       })
 
@@ -29,6 +29,7 @@ db.connect = () => {
     const ReviewQuestionSetModel = require('./review_question_set')
     //const Review = require('./review')
     //const Review_answer = require('./review_answer')
+    const RegistrationManagementModel = require('./registration_management')
 
     const User = UserModel(sequelize, Sequelize)
     const Group = GroupModel(sequelize, Sequelize)
@@ -37,8 +38,15 @@ db.connect = () => {
     const TopicDate = TopicDateModel(sequelize, Sequelize)
     const Registration = RegistrationModel(sequelize, Sequelize)
     const Configuration = ConfigurationModel(sequelize, Sequelize)
-    const RegistrationQuestionSet = RegistrationQuestionSetModel(sequelize, Sequelize)
+    const RegistrationQuestionSet = RegistrationQuestionSetModel(
+      sequelize,
+      Sequelize
+    )
     const ReviewQuestionSet = ReviewQuestionSetModel(sequelize, Sequelize)
+    const RegistrationManagement = RegistrationManagementModel(
+      sequelize,
+      Sequelize
+    )
 
     db.User = User
     db.Group = Group
@@ -49,6 +57,7 @@ db.connect = () => {
     db.Configuration = Configuration
     db.RegistrationQuestionSet = RegistrationQuestionSet
     db.ReviewQuestionSet = ReviewQuestionSet
+    db.RegistrationManagement = RegistrationManagement
 
     db.User.associate(db)
     db.Group.associate(db)
