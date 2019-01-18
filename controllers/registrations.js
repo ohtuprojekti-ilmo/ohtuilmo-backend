@@ -11,12 +11,23 @@ const handleDatabaseError = (res, error) => {
   res.status(500).json({ error: 'database error' })
 }
 
-registrationsRouter.post('/', checkLogin, (req, res) => {
+const isRegistrationOpen = (req, res) => {
+  db.RegistrationManagement.findOne({ order:[['createdAt', 'DESC']]  })
+    .then(registration_management => {
+      if(!registration_management.ProjectRegistartionOpen) return res.status(400).json({ error: 'registration not open' })
+
+        .catch(error => handleDatabaseError(res, error))
+    })
+}
+
+registrationsRouter.post('/', checkLogin, isRegistrationOpen, (req, res) => {
   if (!req.body.questions) return res.status(400).json({ error: 'questions missing' })
   if (!req.body.preferred_topics) return res.status(400).json({ error: 'preferred_topics missing' })
   const token = getTokenFrom(req)
   const decodedToken = jwt.verify(token, config.secret)
   const loggedInUserStudentNumber = decodedToken.id
+
+
 
   db.User.findOne({ where: { student_number: loggedInUserStudentNumber } })
     .then(user => {
