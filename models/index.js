@@ -1,20 +1,13 @@
 const Sequelize = require('sequelize')
+const config = require('../config/config.json')
+
 const db = {}
 
 db.connect = () => {
-  setTimeout(function () {
-    const sequelize = new Sequelize('postgres', 'postgres', null, {
-      host: 'db',
-      port: '5432',
-      dialect: 'postgres',
-      operatorsAliases: false,
-      pool: {
-        max: 5,
-        min: 0,
-        acquire: 10000,
-        idle: 300000000
-      }
-    })
+  const sequelizeConfig = config[process.env.NODE_ENV]
+
+  setTimeout(function() {
+    const sequelize = new Sequelize(sequelizeConfig)
 
     sequelize
       .authenticate()
