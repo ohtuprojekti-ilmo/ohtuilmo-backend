@@ -1,6 +1,6 @@
 const registrationsRouter = require('express').Router()
 const db = require('../models/index')
-const config = require('../utils/config')
+const config = require('../config/')
 const jwt = require('jsonwebtoken')
 const checkLogin = require('../utils/middleware/routeChecks').checkLogin
 const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin

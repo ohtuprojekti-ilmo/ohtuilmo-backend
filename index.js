@@ -4,7 +4,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const logger = require('./utils/middleware/logger')
 const cors = require('cors')
-const config = require('./utils/config')
+const config = require('./config/')
 
 var unless = (path, middleware) => {
   return (req, res, next) => {
