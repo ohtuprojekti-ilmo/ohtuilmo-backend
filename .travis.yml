@@ -5,9 +5,8 @@ install:
   - npm install
 script:
   - npm run test
-after_success:
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
-      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD ;
-      docker build -t ohtuprojektiilmo/ohtuback . ;
-      docker push ohtuprojektiilmo/ohtuback ;
-    fi;
+deploy:
+  provider: script
+  script: deploy_dockerhub.sh
+  on:
+    branch: master
