@@ -12,99 +12,122 @@ const format = (topic) => {
 }
 
 const isSecretId = (id) => {
-  return (id.slice(0, 1) === 'a')
+  return id.slice(0, 1) === 'a'
 }
 
 topicsRouter.post('/', (req, res) => {
-  if (!req.body.content) return res.status(400).json({ error: 'content undefined' })
+  if (!req.body.content)
+    return res.status(400).json({ error: 'content undefined' })
   const secret_id = getRandomId()
-  db.Topic.create({
-    content: req.body.content,
-    acronym: req.body.acronym,
-    secret_id
-  })
-    .then(topic => {
-      email.sendSecretLink(topic.secret_id, topic.content.email)
-      res.status(200).json({ topic })
+
+  db.RegistrationManagement.findOne({ order: [['createdAt', 'DESC']] })
+    .then((registration_management) => {
+      if (!registration_management.topic_registration_open) {
+        return res
+          .status(400)
+          .json({ error: 'topic registration is not currently open' })
+      }
+      db.Topic.create({
+        content: req.body.content,
+        acronym: req.body.acronym,
+        secret_id
+      })
+        .then((topic) => {
+          email.sendSecretLink(topic.secret_id, topic.content.email)
+          res.status(200).json({ topic })
+        })
+        .catch((error) => {
+          console.log(error)
+          res.status(500).json({ error: 'database error' })
+        })
     })
-    .catch(error => {
+    .catch((error) => {
       console.log(error)
       res.status(500).json({ error: 'database error' })
     })
 })
 
-topicsRouter.put('/:id', (req, res, next) => {
-  //skip admin check if id is secret_id
-  if (isSecretId(req.params.id)) res.locals.isSecret = true
-  next()
-}, (req, res, next) => {
-  if (!res.locals.isSecret) checkAdmin(req, res, next)
-  else next()
-}, (req, res) => {
-  //don't try to compare id (integer) to secret_id (string) in db
-  if (res.locals.isSecret) {
-    db.Topic.findOne({
-      where: {
-        secret_id: req.params.id
-      }
-    })
-      .then(topic => {
-        if (!topic) return res.status(400).json({ error: 'no topic with that id' })
-        topic.update({
-          active: req.body.active,
-          content: req.body.content,
-          acronym: req.body.acronym
-        })
-          .then(topic => {
-            topic.reload().then(topic => {
-              topic = format(topic)
-              res.status(200).json({ topic })
+topicsRouter.put(
+  '/:id',
+  (req, res, next) => {
+    //skip admin check if id is secret_id
+    if (isSecretId(req.params.id)) res.locals.isSecret = true
+    next()
+  },
+  (req, res, next) => {
+    if (!res.locals.isSecret) checkAdmin(req, res, next)
+    else next()
+  },
+  (req, res) => {
+    //don't try to compare id (integer) to secret_id (string) in db
+    if (res.locals.isSecret) {
+      db.Topic.findOne({
+        where: {
+          secret_id: req.params.id
+        }
+      })
+        .then((topic) => {
+          if (!topic)
+            return res.status(400).json({ error: 'no topic with that id' })
+          topic
+            .update({
+              active: req.body.active,
+              content: req.body.content,
+              acronym: req.body.acronym
             })
-          })
-          .catch(error => {
-            console.log(error)
-            res.status(500).json({ error: 'database error' })
-          })
-      })
-      .catch(error => {
-        console.log(error)
-        res.status(500).json({ error: 'database error' })
-      })
-  } else {
-    db.Topic.findById(req.params.id)
-      .then(topic => {
-        if (!topic) return res.status(400).json({ error: 'no topic with that id' })
-        topic.update({
-          active: req.body.active,
-          content: req.body.content,
-          acronym: req.body.acronym
-        })
-          .then(topic => {
-            topic.reload().then(topic => {
-              topic = format(topic)
-              res.status(200).json({ topic })
+            .then((topic) => {
+              topic.reload().then((topic) => {
+                topic = format(topic)
+                res.status(200).json({ topic })
+              })
             })
-          })
-          .catch(error => {
-            console.log(error)
-            res.status(500).json({ error: 'database error' })
-          })
-      })
-      .catch(error => {
-        console.log(error)
-        res.status(500).json({ error: 'database error' })
-      })
+            .catch((error) => {
+              console.log(error)
+              res.status(500).json({ error: 'database error' })
+            })
+        })
+        .catch((error) => {
+          console.log(error)
+          res.status(500).json({ error: 'database error' })
+        })
+    } else {
+      db.Topic.findById(req.params.id)
+        .then((topic) => {
+          if (!topic)
+            return res.status(400).json({ error: 'no topic with that id' })
+          topic
+            .update({
+              active: req.body.active,
+              content: req.body.content,
+              acronym: req.body.acronym
+            })
+            .then((topic) => {
+              topic.reload().then((topic) => {
+                topic = format(topic)
+                res.status(200).json({ topic })
+              })
+            })
+            .catch((error) => {
+              console.log(error)
+              res.status(500).json({ error: 'database error' })
+            })
+        })
+        .catch((error) => {
+          console.log(error)
+          res.status(500).json({ error: 'database error' })
+        })
+    }
   }
-})
+)
 
 topicsRouter.get('/', checkAdmin, (req, res) => {
   db.Topic.findAll({})
-    .then(topics => {
-      res.status(200).json({ topics:
-        shuffle(topics.map(topic => format(topic)))
-      })
+    .then((topics) => {
+      res
+        .status(200)
+        .json({ topics: shuffle(topics.map((topic) => format(topic))) })
     })
-    .catch(error => {
+    .catch((error) => {
       console.log(error)
       res.status(500).json({ error: 'database error' })
     })
@@ -116,13 +139,12 @@ topicsRouter.get('/active', (req, res) => {
       active: true
     }
   })
-    .then(topics => {
+    .then((topics) => {
       res.status(200).json({
-        topics:
-          shuffle(topics.map(topic => format(topic)))
+        topics: shuffle(topics.map((topic) => format(topic)))
       })
     })
-    .catch(error => {
+    .catch((error) => {
       console.log(error)
       res.status(500).json({ error: 'database error' })
     })
@@ -136,12 +158,13 @@ topicsRouter.get('/:id', (req, res) => {
         secret_id: id
       }
     })
-      .then(topic => {
-        if (!topic) return res.status(400).json({ error: 'no topic with that id' })
+      .then((topic) => {
+        if (!topic)
+          return res.status(400).json({ error: 'no topic with that id' })
         topic = format(topic)
         res.status(200).json({ topic })
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error)
         res.status(500).json({ error: 'database error' })
       })
@@ -151,12 +174,13 @@ topicsRouter.get('/:id', (req, res) => {
         id: id
       }
     })
-      .then(topic => {
-        if (!topic) return res.status(400).json({ error: 'no topic with that id' })
+      .then((topic) => {
+        if (!topic)
+          return res.status(400).json({ error: 'no topic with that id' })
         topic = format(topic)
         res.status(200).json({ topic })
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error)
         res.status(500).json({ error: 'database error' })
       })

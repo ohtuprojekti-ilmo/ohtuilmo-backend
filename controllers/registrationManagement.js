@@ -37,23 +37,21 @@ const createChecks = (req, res) => {
     !isDefined(topic_registration_message)
   ) {
     res.status(400).json({
-      error: 'All attributes in registrationManagement object must be defined.'
+      error: 'All attributes must be defined'
     })
   } else if (
     !project_registration_open &&
     project_registration_message.length === 0
   ) {
     res.status(400).json({
-      error:
-        'project_registration_message must be provided when project registration is closed'
+      error: 'Message must be provided when project registration is closed'
     })
   } else if (
     !topic_registration_open &&
     topic_registration_message.length === 0
   ) {
     res.status(400).json({
-      error:
-        'topic_registration_message must be provided when topic registration is closed'
+      error: 'Message must be provided when topic registration is closed'
     })
   } else {
     create(req, res)
