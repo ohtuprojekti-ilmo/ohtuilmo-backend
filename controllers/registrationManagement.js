@@ -11,7 +11,7 @@ const create = (req, res) => {
 
   db.RegistrationManagement.create(registrationManagement)
     .then((createdRegistrationManagement) => {
-      res.status(301).json(createdRegistrationManagement)
+      res.status(201).json(createdRegistrationManagement)
     })
     .catch((error) => {
       handleDatabaseError(res, error)
