@@ -1,5 +1,4 @@
-// eslint-disable-next-line semi
-'use strict';
+'use strict'
 
 /*
  * This base migration attempts to create an 1:1 schema with the schema on the
@@ -247,7 +246,7 @@ module.exports = {
     )
   },
 
-  down: async query => {
+  down: async (query) => {
     // Since this is the base migration, rolling back this migration should
     // delete all of the tables and their associations.
 
@@ -296,7 +295,7 @@ module.exports = {
     ]
 
     return await Promise.all(
-      tableNames.map(tableName => query.dropTable(tableName))
+      tableNames.map((tableName) => query.dropTable(tableName))
     )
   }
 }
