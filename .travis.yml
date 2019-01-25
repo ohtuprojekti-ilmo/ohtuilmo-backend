@@ -7,6 +7,6 @@ script:
   - npm run test
 deploy:
   provider: script
-  script: deploy_dockerhub.sh
+  script: "./deploy_dockerhub.sh"
   on:
     branch: master
