@@ -15,31 +15,32 @@ const isSecretId = (id) => {
   return id.slice(0, 1) === 'a'
 }
 
-topicsRouter.post('/', (req, res) => {
-  if (!req.body.content)
-    return res.status(400).json({ error: 'content undefined' })
-  const secret_id = getRandomId()
-
-  db.RegistrationManagement.findOne({ order: [['createdAt', 'DESC']] })
-    .then((registration_management) => {
+const registrationCheck = (req, res, next) => {
+  db.RegistrationManagement.findOne({ order: [['createdAt', 'DESC']] }).then(
+    (registration_management) => {
       if (!registration_management.topic_registration_open) {
         return res
           .status(400)
           .json({ error: 'topic registration is not currently open' })
       }
-      db.Topic.create({
-        content: req.body.content,
-        acronym: req.body.acronym,
-        secret_id
-      })
-        .then((topic) => {
-          email.sendSecretLink(topic.secret_id, topic.content.email)
-          res.status(200).json({ topic })
-        })
-        .catch((error) => {
-          console.log(error)
-          res.status(500).json({ error: 'database error' })
-        })
+      next()
+    }
+  )
+}
+
+topicsRouter.post('/', registrationCheck, (req, res) => {
+  if (!req.body.content)
+    return res.status(400).json({ error: 'content undefined' })
+  const secret_id = getRandomId()
+
+  db.Topic.create({
+    content: req.body.content,
+    acronym: req.body.acronym,
+    secret_id
+  })
+    .then((topic) => {
+      email.sendSecretLink(topic.secret_id, topic.content.email)
+      res.status(200).json({ topic })
     })
     .catch((error) => {
       console.log(error)
