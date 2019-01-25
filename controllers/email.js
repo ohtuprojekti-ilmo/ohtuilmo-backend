@@ -1,6 +1,6 @@
 const emailRouter = require('express').Router()
 const nodemailer = require('nodemailer')
-const config = require('../utils/config').email
+const config = require('../config/').email
 
 const sendSecretLink = (secretId, address) => {
   const options = {
