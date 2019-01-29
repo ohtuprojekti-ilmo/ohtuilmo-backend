@@ -35,7 +35,7 @@ loginRouter.post('/', async (req, res) => {
   } catch (error) {
     //error from auth server
     console.log(error)
-    res.status(500).json({ error: 'authentication error' })
+    return res.status(500).json({ error: 'authentication error' })
   }
   if (response.data.error) {
     //incorrect credentials response from auth server
