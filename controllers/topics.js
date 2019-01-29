@@ -15,17 +15,25 @@ const isSecretId = (id) => {
   return id.slice(0, 1) === 'a'
 }
 
-const registrationCheck = (req, res, next) => {
-  db.RegistrationManagement.findOne({ order: [['createdAt', 'DESC']] }).then(
-    (registration_management) => {
-      if (!registration_management.topic_registration_open) {
-        return res
-          .status(400)
-          .json({ error: 'topic registration is not currently open' })
-      }
-      next()
+const registrationCheck = async (req, res, next) => {
+  try {
+    const latestConfig = await db.RegistrationManagement.findOne({
+      order: [['createdAt', 'DESC']]
+    })
+
+    if (!latestConfig || !latestConfig.topic_registration_open) {
+      // registration config was not found or the topic registration was closed
+      return res
+        .status(400)
+        .json({ error: 'topic registration is not currently open' })
     }
-  )
+
+    // pass request on to the next handler
+    next()
+  } catch (err) {
+    console.error('Error in registrationCheck', err)
+    return res.status(500).json({ error: 'database error' })
+  }
 }
 
 topicsRouter.post('/', registrationCheck, (req, res) => {

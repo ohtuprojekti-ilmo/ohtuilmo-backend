@@ -6,77 +6,82 @@ const handleDatabaseError = (res, error) => {
   console.log(error)
   res.status(500).json({ error: 'database error' })
 }
-const create = (req, res) => {
+
+const create = async (req, res) => {
   const { registrationManagement } = req.body
 
-  db.RegistrationManagement.create(registrationManagement)
-    .then((createdRegistrationManagement) => {
-      res.status(201).json(createdRegistrationManagement)
-    })
-    .catch((error) => {
-      handleDatabaseError(res, error)
-    })
+  try {
+    const createdConfig = await db.RegistrationManagement.create(
+      registrationManagement
+    )
+    return res.status(201).json(createdConfig)
+  } catch (err) {
+    return handleDatabaseError(res, err)
+  }
 }
 
-const isDefined = (attribute) => {
-  return attribute !== undefined
-}
+const isNil = (value) => value === undefined || value === null
 
-const createChecks = (req, res) => {
+const validateRegistrationManagement = (registrationManagement) => {
+  if (!registrationManagement) {
+    return 'All attributes must be defined'
+  }
+
   const {
     project_registration_open,
     project_registration_message,
     topic_registration_open,
     topic_registration_message
-  } = req.body.registrationManagement
+  } = registrationManagement
 
   if (
-    !isDefined(project_registration_open) ||
-    !isDefined(project_registration_message) ||
-    !isDefined(topic_registration_open) ||
-    !isDefined(topic_registration_message)
+    isNil(project_registration_open) ||
+    isNil(project_registration_message) ||
+    isNil(topic_registration_open) ||
+    isNil(topic_registration_message)
   ) {
-    res.status(400).json({
-      error: 'All attributes must be defined'
-    })
-  } else if (
-    !project_registration_open &&
-    project_registration_message.length === 0
-  ) {
-    res.status(400).json({
-      error: 'Message must be provided when project registration is closed'
-    })
-  } else if (
-    !topic_registration_open &&
-    topic_registration_message.length === 0
-  ) {
-    res.status(400).json({
-      error: 'Message must be provided when topic registration is closed'
-    })
-  } else {
-    create(req, res)
+    return 'All attributes must be defined'
   }
+
+  if (!project_registration_open && project_registration_message.length === 0) {
+    return 'Message must be provided when project registration is closed'
+  }
+
+  if (!topic_registration_open && topic_registration_message.length === 0) {
+    return 'Message must be provided when topic registration is closed'
+  }
+
+  return null
 }
 
-registrationManagementRouter.post('/', checkAdmin, (req, res) => {
-  createChecks(req, res)
+registrationManagementRouter.post('/', checkAdmin, async (req, res) => {
+  const { registrationManagement } = req.body
+
+  const error = validateRegistrationManagement(registrationManagement)
+  if (error) {
+    return res.status(400).json({ error })
+  }
+
+  create(req, res)
 })
 
-registrationManagementRouter.get('/', (req, res) => {
-  db.RegistrationManagement.findOne({ order: [['createdAt', 'DESC']] })
-    .then((entry) => {
-      if (!entry) {
-        res.status(400).json({
-          error:
-            'There are no saved registration management configurations in database.'
-        })
-      } else {
-        res.status(200).json({ registrationManagement: entry })
-      }
+registrationManagementRouter.get('/', async (req, res) => {
+  try {
+    const entry = await db.RegistrationManagement.findOne({
+      order: [['createdAt', 'DESC']]
     })
-    .catch((error) => {
-      handleDatabaseError(res, error)
-    })
+
+    if (!entry) {
+      return res.status(400).json({
+        error:
+          'There are no saved registration management configurations in database.'
+      })
+    }
+
+    return res.status(200).json({ registrationManagement: entry })
+  } catch (err) {
+    return handleDatabaseError(res, err)
+  }
 })
 
 module.exports = registrationManagementRouter

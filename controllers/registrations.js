@@ -11,17 +11,25 @@ const handleDatabaseError = (res, error) => {
   res.status(500).json({ error: 'database error' })
 }
 
-const registrationCheck = (req, res, next) => {
-  db.RegistrationManagement.findOne({ order: [['createdAt', 'DESC']] }).then(
-    (registration_management) => {
-      if (!registration_management.project_registration_open) {
-        return res
-          .status(400)
-          .json({ error: 'project registration is not currently open' })
-      }
-      next()
+const registrationCheck = async (req, res, next) => {
+  try {
+    const latestConfig = await db.RegistrationManagement.findOne({
+      order: [['createdAt', 'DESC']]
+    })
+
+    if (!latestConfig || !latestConfig.project_registration_open) {
+      // registration config was not found or the registration was closed
+      return res
+        .status(400)
+        .json({ error: 'project registration is not currently open' })
     }
-  )
+
+    // pass request on to the next handler
+    next()
+  } catch (err) {
+    console.error('Error in registrationCheck', err)
+    return res.status(500).json({ error: 'database error' })
+  }
 }
 
 registrationsRouter.post('/', checkLogin, registrationCheck, (req, res) => {
