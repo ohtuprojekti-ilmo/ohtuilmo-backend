@@ -128,4 +128,28 @@ registrationsRouter.get('/current', checkAdmin, (req, res) => {
     .catch((error) => handleDatabaseError(res, error))
 })
 
+registrationsRouter.get('/', checkLogin, (req, res) => {
+  const token = getTokenFrom(req)
+  const decodedToken = jwt.verify(token, config.secret)
+  const loggedInUserStudentNumber = decodedToken.id
+
+  db.Configuration.findOne({ where: { active: true } })
+    .then((config) => {
+      db.Registration.findOne({
+        where: {
+          configuration_id: config.id,
+          studentStudentNumber: loggedInUserStudentNumber
+        }
+      }).then((registration) => {
+        if (!registration) {
+          return res.status(204).send()
+        }
+        return res.status(200).json({ registration: registration })
+      })
+    })
+    .catch((error) => {
+      handleDatabaseError(res, error)
+    })
+})
+
 module.exports = registrationsRouter
