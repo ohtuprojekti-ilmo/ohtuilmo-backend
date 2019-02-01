@@ -139,7 +139,8 @@ registrationsRouter.get('/', checkLogin, (req, res) => {
         where: {
           configuration_id: config.id,
           studentStudentNumber: loggedInUserStudentNumber
-        }
+        },
+        include: ['student']
       }).then((registration) => {
         if (!registration) {
           return res.status(204).send()
