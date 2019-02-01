@@ -23,8 +23,6 @@ app.use(unless('/api/login', logger))
 
 // Routers
 const loginRouter = require('./controllers/login')
-const groupsRouter = require('./controllers/groups')
-const membershipRouter = require('./controllers/memberships')
 const topicsRouter = require('./controllers/topics')
 const topicDatesrouter = require('./controllers/topicDates')
 const tokenCheckRouter = require('./controllers/tokenCheck')
@@ -36,8 +34,6 @@ const reviewQuestionSetsRouter = require('./controllers/reviewQuestionSets')
 const emailRouter = require('./controllers/email').emailRouter
 const registrationManagementRouter = require('./controllers/registrationManagement')
 app.use('/api/login', loginRouter)
-app.use('/api/groups', groupsRouter)
-app.use('/api/memberships', membershipRouter)
 app.use('/api/topics', topicsRouter)
 app.use('/api/topicDates', topicDatesrouter)
 app.use('/api/tokenCheck', tokenCheckRouter)
