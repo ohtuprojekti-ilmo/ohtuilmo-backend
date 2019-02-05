@@ -1,6 +1,6 @@
 const configurationsRouter = require('express').Router()
 const db = require('../models/index')
-const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
+const { checkAdmin } = require('../middleware')
 
 // determines which associated models are returned with configuration
 const includeArray = ['review_question_set_1', 'review_question_set_2', 'registration_question_set']

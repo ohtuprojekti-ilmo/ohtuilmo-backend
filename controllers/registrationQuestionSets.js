@@ -1,6 +1,6 @@
 const registrationQuestionSetsRouter = require('express').Router()
 const db = require('../models/index')
-const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
+const { checkAdmin } = require('../middleware')
 
 const handleDatabaseError = (res, error) => {
   console.log(error)

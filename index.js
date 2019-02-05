@@ -1,10 +1,10 @@
 const http = require('http')
 const express = require('express')
-const app = express()
 const bodyParser = require('body-parser')
-const logger = require('./utils/middleware/logger')
 const cors = require('cors')
+const { logger } = require('./middleware')
 const config = require('./config/')
+const app = express()
 
 var unless = (path, middleware) => {
   return (req, res, next) => {
