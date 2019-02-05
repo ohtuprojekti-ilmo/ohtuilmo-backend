@@ -6,17 +6,8 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       primaryKey: true
     },
-    group_name: {
-      type: Sequelize.STRING
-    }
+    name: Sequelize.STRING
   })
-
-  Group.associate = (models) => {
-    Group.hasMany(models.Membership, {
-      foreignKey: 'group_id',
-      as: 'Memberships'
-    })
-  }
 
   return Group
 }

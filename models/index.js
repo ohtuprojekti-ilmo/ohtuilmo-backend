@@ -20,7 +20,6 @@ db.connect = () => {
 
     const UserModel = require('./user')
     const GroupModel = require('./group')
-    const MembershipModel = require('./membership')
     const TopicModel = require('./topic')
     const TopicDateModel = require('./topic_date')
     const RegistrationModel = require('./registration')
@@ -33,7 +32,6 @@ db.connect = () => {
 
     const User = UserModel(sequelize, Sequelize)
     const Group = GroupModel(sequelize, Sequelize)
-    const Membership = MembershipModel(sequelize, Sequelize)
     const Topic = TopicModel(sequelize, Sequelize)
     const TopicDate = TopicDateModel(sequelize, Sequelize)
     const Registration = RegistrationModel(sequelize, Sequelize)
@@ -50,7 +48,6 @@ db.connect = () => {
 
     db.User = User
     db.Group = Group
-    db.Membership = Membership
     db.Topic = Topic
     db.TopicDate = TopicDate
     db.Registration = Registration
@@ -59,8 +56,21 @@ db.connect = () => {
     db.ReviewQuestionSet = ReviewQuestionSet
     db.RegistrationManagement = RegistrationManagement
 
-    db.User.associate(db)
-    db.Group.associate(db)
+    Group.belongsTo(Topic, {
+      as: 'topic'
+    })
+    Group.belongsTo(Configuration, {
+      as: 'configuration'
+    })
+    Group.belongsToMany(User, {
+      through: 'group_students',
+      as: 'students'
+    })
+    Group.belongsTo(User, {
+      as: 'instructor',
+      foreignKey: 'instructorId'
+    })
+
     db.Configuration.associate(db)
     db.Registration.associate(db)
 
