@@ -66,6 +66,10 @@ db.connect = () => {
       through: 'group_students',
       as: 'students'
     })
+    User.belongsToMany(Group, {
+      through: 'group_students',
+      as: 'groups'
+    })
     Group.belongsTo(User, {
       as: 'instructor',
       foreignKey: 'instructorId'
