@@ -1,10 +1,6 @@
 const registrationsRouter = require('express').Router()
 const db = require('../models/index')
-const config = require('../config/')
-const jwt = require('jsonwebtoken')
-const checkLogin = require('../utils/middleware/routeChecks').checkLogin
-const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
-const getTokenFrom = require('../utils/middleware/routeChecks').getTokenFrom
+const { checkAdmin, checkLogin } = require('../middleware')
 
 const handleDatabaseError = (res, error) => {
   console.log(error)
@@ -37,9 +33,7 @@ registrationsRouter.post('/', checkLogin, registrationCheck, (req, res) => {
     return res.status(400).json({ error: 'questions missing' })
   if (!req.body.preferred_topics)
     return res.status(400).json({ error: 'preferred_topics missing' })
-  const token = getTokenFrom(req)
-  const decodedToken = jwt.verify(token, config.secret)
-  const loggedInUserStudentNumber = decodedToken.id
+  const loggedInUserStudentNumber = req.user.id
 
   db.User.findOne({ where: { student_number: loggedInUserStudentNumber } })
     .then((user) => {
@@ -129,9 +123,7 @@ registrationsRouter.get('/current', checkAdmin, (req, res) => {
 })
 
 registrationsRouter.get('/', checkLogin, (req, res) => {
-  const token = getTokenFrom(req)
-  const decodedToken = jwt.verify(token, config.secret)
-  const loggedInUserStudentNumber = decodedToken.id
+  const loggedInUserStudentNumber = req.user.id
 
   db.Configuration.findOne({ where: { active: true } })
     .then((config) => {

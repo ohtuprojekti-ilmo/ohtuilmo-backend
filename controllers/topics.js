@@ -1,6 +1,6 @@
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
-const checkAdmin = require('../utils/middleware/routeChecks').checkAdmin
+const { checkAdmin } = require('../middleware')
 const email = require('./email')
 const getRandomId = require('../utils/idGeneration').getRandomId
 const shuffle = require('shuffle-array')
