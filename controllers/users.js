@@ -24,7 +24,7 @@ usersRouter.put('/:studentNumber', checkLogin, async (req, res) => {
 
     const updatedUser = await user.update({ email })
     const refreshedUser = await updatedUser.reload()
-    res.status(200).json({ refreshedUser })
+    res.status(200).json({ user: refreshedUser })
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: 'database error' })
