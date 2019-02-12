@@ -6,22 +6,19 @@
 
 'use strict'
 
-const up = async (query, Sequelize) => {
-  await query.addColumn(
-    'registration_managements',
-    'project_registration_info',
-    Sequelize.STRING
-  )
-}
-
-const down = async (query) => {
-  await query.removeColumn(
-    'registration_managements',
-    'project_registration_info'
-  )
-}
-
 module.exports = {
-  up,
-  down
+  up: async (query, Sequelize) => {
+    await query.addColumn(
+      'registration_managements',
+      'project_registration_info',
+      Sequelize.STRING
+    )
+  },
+
+  down: async (query) => {
+    await query.removeColumn(
+      'registration_managements',
+      'project_registration_info'
+    )
+  }
 }
