@@ -30,6 +30,7 @@ const validateRegistrationManagement = (registrationManagement) => {
   const {
     project_registration_open,
     project_registration_message,
+    project_registration_info,
     topic_registration_open,
     topic_registration_message
   } = registrationManagement
@@ -37,6 +38,7 @@ const validateRegistrationManagement = (registrationManagement) => {
   if (
     isNil(project_registration_open) ||
     isNil(project_registration_message) ||
+    isNil(project_registration_info) ||
     isNil(topic_registration_open) ||
     isNil(topic_registration_message)
   ) {
