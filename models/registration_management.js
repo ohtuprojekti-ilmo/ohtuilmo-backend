@@ -11,6 +11,9 @@ module.exports = (sequelize, Sequelize) => {
     project_registration_message: {
       type: Sequelize.STRING
     },
+    project_registration_info: {
+      type: Sequelize.STRING
+    },
     topic_registration_open: {
       type: Sequelize.BOOLEAN
     },
