@@ -20,7 +20,7 @@
     "node"
   ],
   "author": "jexniemi",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ohtuprojekti-ilmo/ohtuilmo-backend/issues"
   },
