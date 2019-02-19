@@ -1,5 +1,10 @@
 'use strict'
 
+/**
+ * This seed adds normal user and admin user for e2e
+ * testing page access in frontend.
+ */
+
 module.exports = {
   up: async (query) => {
     await query.bulkInsert(
