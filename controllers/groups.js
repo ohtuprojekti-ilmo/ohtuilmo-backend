@@ -198,7 +198,7 @@ router.post('/', checkAdmin, async (req, res) => {
     res.json(formatCreatedGroup(createdGroup, groupStudents))
   } catch (err) {
     console.error('Error while creating group', err)
-    res.json(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal server error' })
   }
 })
 
@@ -258,12 +258,20 @@ router.put('/:groupId', checkAdmin, async (req, res) => {
       })
       res.status(200).json(formatGroup(updatedGroupWithStudents))
     } else {
-      res.json(500).json({ error: 'Internal server error' })
+      res.status(500).json({ error: 'Internal server error' })
     }
   } catch (error) {
     console.error('Error while updating group', error)
-    res.json(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal server error' })
   }
+})
+
+router.delete('/:groupId', checkAdmin, async (req, res) => {
+  const success = await db.Group.destroy({ where: { id: req.params.groupId } })
+  success
+    ? console.log(`Group ${req.params.groupId} destroyed.`)
+    : console.log('Nothing to delete.')
+  res.status(204).end()
 })
 
 module.exports = router
