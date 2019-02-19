@@ -180,7 +180,7 @@ router.post('/', checkAdmin, async (req, res) => {
             name,
             topicId,
             configurationId,
-            instructorId
+            instructorId: instructorId || null
           },
           options
         )
@@ -227,7 +227,7 @@ router.put('/:groupId', checkAdmin, async (req, res) => {
         {
           name,
           topicId,
-          instructorId
+          instructorId: instructorId || null
         },
         {
           ...options,
