@@ -1,8 +1,10 @@
-/**
- * This seed file inserts a registration management line for testing frontend redirects
- */
-
 'use strict'
+
+/**
+ * This seed file inserts a registration management
+ * line for testing frontend redirects.
+ * With this seed reaching landing page can be verified.
+ */
 
 module.exports = {
   up: async (query) => {
@@ -26,6 +28,6 @@ module.exports = {
   },
 
   down: async (query) => {
-    await query.bulkDelete('registration_managements', {})
+    await query.bulkDelete('registration_managements', null, {})
   }
 }
