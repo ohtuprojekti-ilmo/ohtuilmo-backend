@@ -220,34 +220,46 @@ router.put('/:groupId', checkAdmin, async (req, res) => {
       return res.status(400).json({ error: 'group does not exist' })
     }
 
-    //console.log('fetched group:', group)
-    const { updatedGroup, groupStudents } = await db.sequelize.transaction(
-      async (transaction) => {
-        const options = { transaction }
+    const updatedGroup = await db.sequelize.transaction(async (transaction) => {
+      const options = { transaction }
 
-        const updatedGroup = await group.update(
-          {
-            name,
-            topicId,
-            instructorId
-          },
-          options
-        )
-
-        await updatedGroup.setStudents(studentIds, options)
-
-        const groupStudents = await updatedGroup.getStudents()
-
-        return {
-          updatedGroup,
-          groupStudents
+      const updatedGroup = await group.update(
+        {
+          name,
+          topicId,
+          instructorId
+        },
+        {
+          ...options,
+          returning: true,
+          plain: true
         }
-      }
-    )
+      )
 
-    console.log('groupStudents:', groupStudents)
-    //res.status(200).json(formatCreatedGroup(updatedGroup, groupStudents))
-    res.status(200).json(updatedGroup)
+      await updatedGroup.setStudents(studentIds, options)
+
+      return updatedGroup
+    })
+
+    // Getting updated students from inside the transaction did not work,
+    // so we fetch the whole group here
+
+    if (updatedGroup) {
+      const updatedGroupWithStudents = await db.Group.findOne({
+        where: { id: req.params.groupId },
+        include: [
+          {
+            as: 'students',
+            model: db.User,
+            attributes: ['student_number'], // only select the student number
+            through: { attributes: [] } // don't ignore junction table stuff
+          }
+        ]
+      })
+      res.status(200).json(formatGroup(updatedGroupWithStudents))
+    } else {
+      res.json(500).json({ error: 'Internal server error' })
+    }
   } catch (error) {
     console.error('Error while updating group', error)
     res.json(500).json({ error: 'Internal server error' })
