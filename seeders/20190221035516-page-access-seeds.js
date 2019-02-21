@@ -56,8 +56,10 @@ const initialRegistrationQuestionSet = [
     name: 'Kysymyssetti 1',
     questions: JSON.stringify(
       initialQuestionsWithAnswers.map((item) => {
-        delete item.answer
-        return item
+        return {
+          type: item.type,
+          question: item.question
+        }
       })
     )
   }
