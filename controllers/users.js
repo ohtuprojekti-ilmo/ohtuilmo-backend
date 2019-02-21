@@ -1,6 +1,6 @@
 const usersRouter = require('express').Router()
 const db = require('../models/index')
-const { checkLogin } = require('../middleware')
+const { checkLogin, checkAdmin } = require('../middleware')
 
 usersRouter.put('/:studentNumber', checkLogin, async (req, res) => {
   const { email } = req.body
@@ -25,6 +25,16 @@ usersRouter.put('/:studentNumber', checkLogin, async (req, res) => {
     const updatedUser = await user.update({ email })
     const refreshedUser = await updatedUser.reload()
     res.status(200).json({ user: refreshedUser })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'database error' })
+  }
+})
+
+usersRouter.get('/', checkAdmin, async (req, res) => {
+  try {
+    const users = await db.User.findAll()
+    res.status(200).json(users)
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: 'database error' })

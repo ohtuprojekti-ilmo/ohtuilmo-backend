@@ -43,6 +43,14 @@ router.get('/', checkAdmin, async (req, res) => {
 })
 
 const isNil = (obj) => obj === null || obj === undefined
+const isNotNil = (obj) => {
+  return !isNil(obj)
+}
+
+const hasDuplicates = (arr) => {
+  const noDuplicates = new Set(arr)
+  return arr.length !== noDuplicates.size
+}
 
 const topicDoesNotExist = async (topicId) => {
   const foundTopic = await db.Topic.findByPk(topicId)
@@ -86,12 +94,18 @@ const validateGroup = async (body) => {
   if (isNil(topicId) || typeof topicId !== 'number') return 'topicId is missing'
   if (isNil(configurationId) || typeof configurationId !== 'number')
     return 'configurationId is missing'
-  if (isNil(instructorId) || typeof instructorId !== 'string')
-    return 'instructorId is missing'
   if (isNil(studentIds) || !Array.isArray(studentIds))
     return 'studentIds is missing'
   if (studentIds.some((id) => isNil(id) || typeof id !== 'string'))
     return 'students has invalid student numbers'
+
+  if (hasDuplicates(studentIds)) {
+    return 'duplicate student numbers'
+  }
+
+  if (isNotNil(instructorId) && typeof instructorId !== 'string') {
+    return 'instructorId should be a string'
+  }
 
   if (await topicDoesNotExist(topicId)) {
     return `Topic ${topicId} does not exist`
@@ -101,7 +115,7 @@ const validateGroup = async (body) => {
     return `Configuration ${configurationId} does not exist`
   }
 
-  if (await instructorDoesNotExist(instructorId)) {
+  if (!!instructorId && (await instructorDoesNotExist(instructorId))) {
     return `Instructor user ${instructorId} does not exist`
   }
 
@@ -166,7 +180,7 @@ router.post('/', checkAdmin, async (req, res) => {
             name,
             topicId,
             configurationId,
-            instructorId
+            instructorId: instructorId || null
           },
           options
         )
@@ -184,8 +198,80 @@ router.post('/', checkAdmin, async (req, res) => {
     res.json(formatCreatedGroup(createdGroup, groupStudents))
   } catch (err) {
     console.error('Error while creating group', err)
-    res.json(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal server error' })
   }
+})
+
+router.put('/:groupId', checkAdmin, async (req, res) => {
+  const validationError = await validateGroup(req.body)
+
+  if (validationError !== null) {
+    return res.status(400).json({ error: validationError })
+  }
+
+  const { name, topicId, instructorId, studentIds } = req.body
+
+  try {
+    const group = await db.Group.findOne({
+      where: { id: req.params.groupId }
+    })
+
+    if (!group) {
+      return res.status(400).json({ error: 'group does not exist' })
+    }
+
+    const updatedGroup = await db.sequelize.transaction(async (transaction) => {
+      const options = { transaction }
+
+      const updatedGroup = await group.update(
+        {
+          name,
+          topicId,
+          instructorId: instructorId || null
+        },
+        {
+          ...options,
+          returning: true,
+          plain: true
+        }
+      )
+
+      await updatedGroup.setStudents(studentIds, options)
+
+      return updatedGroup
+    })
+
+    // Getting updated students from inside the transaction did not work,
+    // so we fetch the whole group here
+
+    if (updatedGroup) {
+      const updatedGroupWithStudents = await db.Group.findOne({
+        where: { id: req.params.groupId },
+        include: [
+          {
+            as: 'students',
+            model: db.User,
+            attributes: ['student_number'], // only select the student number
+            through: { attributes: [] } // don't ignore junction table stuff
+          }
+        ]
+      })
+      res.status(200).json(formatGroup(updatedGroupWithStudents))
+    } else {
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  } catch (error) {
+    console.error('Error while updating group', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+router.delete('/:groupId', checkAdmin, async (req, res) => {
+  const success = await db.Group.destroy({ where: { id: req.params.groupId } })
+  success
+    ? console.log(`Group ${req.params.groupId} destroyed.`)
+    : console.log('Nothing to delete.')
+  res.status(204).end()
 })
 
 module.exports = router
