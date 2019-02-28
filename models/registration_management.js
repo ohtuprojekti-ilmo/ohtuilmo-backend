@@ -5,6 +5,16 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
+    peer_review_open: {
+      type: Sequelize.BOOLEAN
+    },
+    peer_review_round: {
+      type: Sequelize.INTEGER,
+      validate: {
+        min: 1,
+        max: 2
+      }
+    },
     project_registration_open: {
       type: Sequelize.BOOLEAN
     },

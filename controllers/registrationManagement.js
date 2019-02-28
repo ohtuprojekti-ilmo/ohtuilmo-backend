@@ -28,6 +28,8 @@ const validateRegistrationManagement = (registrationManagement) => {
   }
 
   const {
+    peer_review_open,
+    peer_review_round,
     project_registration_open,
     project_registration_message,
     project_registration_info,
@@ -36,6 +38,8 @@ const validateRegistrationManagement = (registrationManagement) => {
   } = registrationManagement
 
   if (
+    isNil(peer_review_open) ||
+    isNil(peer_review_round) ||
     isNil(project_registration_open) ||
     isNil(project_registration_message) ||
     isNil(project_registration_info) ||
@@ -43,6 +47,10 @@ const validateRegistrationManagement = (registrationManagement) => {
     isNil(topic_registration_message)
   ) {
     return 'All attributes must be defined'
+  }
+
+  if (!(peer_review_round === 1 || peer_review_round === 2)) {
+    return 'Peer review round should be either 1 or 2'
   }
 
   if (!project_registration_open && project_registration_message.length === 0) {
