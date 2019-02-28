@@ -276,16 +276,16 @@ router.delete('/:groupId', checkAdmin, async (req, res) => {
 
 router.get('/bystudent/:student', checkLogin, async (req, res) => {
   if (req.params.student !== req.user.id && !req.user.admin) {
-    res.status(403).json({ error: 'Forbidden' })
+    return res.status(403).json({ error: 'Forbidden' })
   }
 
   try {
     const studentId = req.params.student
-
+    console.log('/bystudent/', studentId)
     const user = await db.User.findByPk(studentId)
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' })
+      return res.status(404).json({ error: 'User not found' })
     }
 
     const groups = await user.getGroups({
@@ -300,14 +300,14 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
     })
 
     if (!groups || groups.length === 0) {
-      res.status(200).json({
+      return res.status(200).json({
         id: -100
       })
     }
 
     const myGroup = groups[0]
 
-    res.status(200).json({
+    return res.status(200).json({
       id: myGroup.id,
       configurationId: myGroup.configurationId,
       groupName: myGroup.name,
@@ -355,6 +355,5 @@ router.get('/byinstructor/:instructor', checkLogin, async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' })
   }
 })
-
 
 module.exports = router
