@@ -29,6 +29,7 @@ db.connect = () => {
   //const Review = require('./review')
   //const Review_answer = require('./review_answer')
   const RegistrationManagementModel = require('./registration_management')
+  const PeerReviewModel = require('./peer_review')
 
   const User = UserModel(sequelize, Sequelize)
   const Group = GroupModel(sequelize, Sequelize)
@@ -45,6 +46,7 @@ db.connect = () => {
     sequelize,
     Sequelize
   )
+  const PeerReview = PeerReviewModel(sequelize, Sequelize)
 
   db.User = User
   db.Group = Group
@@ -55,6 +57,7 @@ db.connect = () => {
   db.RegistrationQuestionSet = RegistrationQuestionSet
   db.ReviewQuestionSet = ReviewQuestionSet
   db.RegistrationManagement = RegistrationManagement
+  db.PeerReview = PeerReview
 
   Group.belongsTo(Topic, {
     as: 'topic'
@@ -73,6 +76,16 @@ db.connect = () => {
   Group.belongsTo(User, {
     as: 'instructor',
     foreignKey: 'instructorId'
+  })
+
+  PeerReview.belongsTo(User, {
+    as: 'user',
+    foreignKey: 'user_id'
+  })
+
+  PeerReview.belongsTo(Configuration, {
+    as: 'configuration',
+    foreignKey: 'configuration_id'
   })
 
   db.Configuration.associate(db)

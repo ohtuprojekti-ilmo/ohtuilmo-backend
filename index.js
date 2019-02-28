@@ -34,6 +34,7 @@ const reviewQuestionSetsRouter = require('./controllers/reviewQuestionSets')
 const emailRouter = require('./controllers/email').emailRouter
 const registrationManagementRouter = require('./controllers/registrationManagement')
 const groupRouter = require('./controllers/groups')
+const peerReview = require('./controllers/peerReview')
 app.use('/api/login', loginRouter)
 app.use('/api/topics', topicsRouter)
 app.use('/api/topicDates', topicDatesrouter)
@@ -46,6 +47,7 @@ app.use('/api/reviewQuestions', reviewQuestionSetsRouter)
 app.use('/api/email', emailRouter)
 app.use('/api/registrationManagement', registrationManagementRouter)
 app.use('/api/groups', groupRouter)
+app.use('/api/peerreview', peerReview)
 
 // Database connection
 const db = require('./models')
