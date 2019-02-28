@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { Op } = require('sequelize')
 const db = require('../models')
-const { checkAdmin } = require('../middleware')
+const { checkAdmin, checkLogin } = require('../middleware')
 
 const formatGroup = (dbGroup) => {
   // pluck only fields we know and need, map student object to student_number
@@ -256,13 +256,13 @@ router.put('/:groupId', checkAdmin, async (req, res) => {
           }
         ]
       })
-      res.status(200).json(formatGroup(updatedGroupWithStudents))
+      return res.status(200).json(formatGroup(updatedGroupWithStudents))
     } else {
-      res.status(500).json({ error: 'Internal server error' })
+      return res.status(500).json({ error: 'Internal server error' })
     }
   } catch (error) {
     console.error('Error while updating group', error)
-    res.status(500).json({ error: 'Internal server error' })
+    return res.status(500).json({ error: 'Internal server error' })
   }
 })
 
@@ -271,7 +271,89 @@ router.delete('/:groupId', checkAdmin, async (req, res) => {
   success
     ? console.log(`Group ${req.params.groupId} destroyed.`)
     : console.log('Nothing to delete.')
-  res.status(204).end()
+  return res.status(204).end()
+})
+
+router.get('/bystudent/:student', checkLogin, async (req, res) => {
+  if (req.params.student !== req.user.id && !req.user.admin) {
+    return res.status(403).json({ error: 'Forbidden' })
+  }
+
+  try {
+    const studentId = req.params.student
+    console.log('/bystudent/', studentId)
+    const user = await db.User.findByPk(studentId)
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    const groups = await user.getGroups({
+      include: [
+        {
+          as: 'students',
+          model: db.User,
+          attributes: ['first_names', 'last_name'], // only select the student number
+          through: { attributes: [] } // don't ignore junction table stuff
+        }
+      ]
+    })
+
+    if (!groups || groups.length === 0) {
+      return res.status(200).json({
+        id: -100
+      })
+    }
+
+    const myGroup = groups[0]
+
+    return res.status(200).json({
+      id: myGroup.id,
+      configurationId: myGroup.configurationId,
+      groupName: myGroup.name,
+      students: myGroup.students
+    })
+  } catch (error) {
+    console.error('Error while updating group', error)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+router.get('/byinstructor/:instructor', checkLogin, async (req, res) => {
+  if (req.params.instructor !== req.user.id && !req.user.admin) {
+    return res.status(401).json({ error: 'Forbidden' })
+  }
+
+  try {
+    const groups = await db.Group.findAll({
+      where: { instructorId: req.params.instructor },
+      include: [
+        {
+          as: 'students',
+          model: db.User,
+          attributes: ['first_names', 'last_name'], // only select the student number
+          through: { attributes: [] } // don't ignore junction table stuff
+        }
+      ]
+    })
+    if (groups.length === 0) {
+      return res.status(404).json({ error: 'Not an instructor' })
+    }
+
+    return res.status(200).json(
+      groups.map((group) => {
+        return {
+          id: group.id,
+          configurationId: group.configurationId,
+          groupName: group.name,
+          students: group.students
+        }
+      })
+    )
+  } catch (error) {
+    console.error('Error while updating group', error)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
 })
 
 module.exports = router
