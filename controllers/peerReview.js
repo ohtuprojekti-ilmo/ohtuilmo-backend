@@ -116,7 +116,7 @@ peerReviewRouter.get('/', checkLogin, async (req, res) => {
     })
 
     if (entry) {
-      return res.status(200).json(true)
+      return res.status(200).json(entry)
     }
 
     return res.status(200).json(false)
