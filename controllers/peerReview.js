@@ -42,7 +42,7 @@ const validateAnswerSheet = (peerReview) => {
         return error
       }
     } else if (question.type !== 'info') {
-      return 'Invalid question type in asnwer sheet'
+      return 'Invalid question type in answer sheet'
     }
   }
   return null
@@ -86,7 +86,6 @@ const validateNumberAnswer = (question) => {
 
 const create = async (req, res) => {
   const { peerReview } = req.body
-  console.log(peerReview)
   try {
     const sentAnswerSheet = await db.PeerReview.create(peerReview)
     return res.status(201).json(sentAnswerSheet)
@@ -97,6 +96,10 @@ const create = async (req, res) => {
 
 peerReviewRouter.post('/', checkLogin, async (req, res) => {
   const { peerReview } = req.body
+
+  if (!peerReview.user_id || req.user.id !== peerReview.user_id) {
+    return res.status(401).json({ error: 'unauthorized' })
+  }
 
   const error = validateAnswerSheet(peerReview)
 
