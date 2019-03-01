@@ -12,8 +12,8 @@ const validateUsersQuery = (query) => {
     return error('Name must be a string')
   }
 
-  if (query.name.length < 3) {
-    return error('Name must contain at least 3 characters')
+  if (query.name.length < 2) {
+    return error('Name must contain at least 2 characters')
   }
 
   return ok()
