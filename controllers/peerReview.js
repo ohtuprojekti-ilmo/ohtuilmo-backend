@@ -1,6 +1,6 @@
 const peerReviewRouter = require('express').Router()
 const db = require('../models/index')
-const { checkLogin } = require('../middleware')
+const { checkLogin, checkAdmin } = require('../middleware')
 
 const handleDatabaseError = (res, error) => {
   console.log(error)
@@ -122,6 +122,17 @@ peerReviewRouter.get('/', checkLogin, async (req, res) => {
     return res.status(200).json(false)
   } catch (err) {
     return handleDatabaseError(res, err)
+  }
+})
+
+peerReviewRouter.get('/all', checkAdmin, async (req, res) => {
+  try {
+    const reviews = await db.PeerReview.findAll({
+      include: ['user']
+    })
+    return res.status(200).json(reviews)
+  } catch (error) {
+    return handleDatabaseError(res, error)
   }
 })
 
