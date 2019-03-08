@@ -91,7 +91,6 @@ reviewQuestionSetsRouter.get('/:id', checkLogin, async (req, res) => {
 
 reviewQuestionSetsRouter.delete('/:id', checkAdmin, async (req, res) => {
   const questionSetId = parseInt(req.params.id, 10)
-  console.log('******ID********', req.params.id)
   if (isNaN(questionSetId)) {
     return res.status(400).json({ error: 'invalid id' })
   }
