@@ -300,9 +300,7 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
     })
 
     if (!groups || groups.length === 0) {
-      return res.status(200).json({
-        id: -100
-      })
+      return res.status(200).json(null)
     }
 
     const myGroup = groups[0]
