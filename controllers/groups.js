@@ -305,13 +305,10 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
 
     const myGroup = groups[0]
     const instructorName = await db.User.findByPk(myGroup.instructorId)
-    let instructorString
-    if (instructorName !== null) {
-      instructorString =
-        instructorName.first_names + ' ' + instructorName.last_name
-    } else {
-      instructorString = 'Tällä ryhmällä ei ole vielä ohjaajaa'
-    }
+    const instructorString = instructorName
+      ? instructorName.first_names + ' ' + instructorName.last_name
+      : 'Tällä ryhmällä ei ole vielä ohjaajaa'
+
     return res.status(200).json({
       id: myGroup.id,
       configurationId: myGroup.configurationId,
