@@ -41,4 +41,20 @@ usersRouter.get('/', checkAdmin, async (req, res) => {
   }
 })
 
+usersRouter.get('/isInstructor', checkLogin, async (req, res) => {
+  try {
+    const instructedGroups = await db.Group.findAll({
+      where: { instructorId: req.user.id }
+    })
+    if (instructedGroups.length > 0) {
+      res.status(200).json({ isInstructor: true })
+    } else {
+      res.status(200).json({ isInstructor: false })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'database error' })
+  }
+})
+
 module.exports = usersRouter
