@@ -300,18 +300,21 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
     })
 
     if (!groups || groups.length === 0) {
-      return res.status(200).json({
-        id: -100
-      })
+      return res.status(200).json(null)
     }
 
     const myGroup = groups[0]
+    const instructorName = await db.User.findByPk(myGroup.instructorId)
+    const instructorString = instructorName
+      ? instructorName.first_names + ' ' + instructorName.last_name
+      : 'Tällä ryhmällä ei ole vielä ohjaajaa'
 
     return res.status(200).json({
       id: myGroup.id,
       configurationId: myGroup.configurationId,
       groupName: myGroup.name,
-      students: myGroup.students
+      students: myGroup.students,
+      instructor: instructorString
     })
   } catch (error) {
     console.error('Error while updating group', error)
