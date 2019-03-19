@@ -111,15 +111,15 @@ peerReviewRouter.post('/', checkLogin, async (req, res) => {
 
 peerReviewRouter.get('/', checkLogin, async (req, res) => {
   try {
-    const entry = await db.PeerReview.findOne({
-      where: { user_id: req.user.id }
+    const config = await db.Configuration.findOne({ where: { active: true } })
+    const entries = await db.PeerReview.findAll({
+      where: {
+        user_id: req.user.id,
+        configuration_id: config.id
+      }
     })
 
-    if (entry) {
-      return res.status(200).json(entry)
-    }
-
-    return res.status(200).json(false)
+    return res.status(200).json(entries)
   } catch (err) {
     return handleDatabaseError(res, err)
   }
