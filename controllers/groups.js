@@ -303,11 +303,20 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
       return res.status(200).json(null)
     }
 
+    const extractCallingName = (firstNames) => {
+      if (firstNames.includes('*')) {
+        return firstNames.split('*')[1].split(' ')[0]
+      }
+      return firstNames.split(' ')[0]
+    }
+
     const myGroup = groups[0]
     const instructorName = await db.User.findByPk(myGroup.instructorId)
     const instructorString = instructorName
-      ? instructorName.first_names + ' ' + instructorName.last_name
-      : 'Tällä ryhmällä ei ole vielä ohjaajaa'
+      ? extractCallingName(instructorName.first_names) +
+        ' ' +
+        instructorName.last_name
+      : ''
 
     return res.status(200).json({
       id: myGroup.id,
