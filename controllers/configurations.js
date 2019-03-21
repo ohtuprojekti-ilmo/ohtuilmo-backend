@@ -165,17 +165,6 @@ configurationsRouter.get('/', checkAdmin, (req, res) => {
     .catch((error) => handleDatabaseError(res, error))
 })
 
-configurationsRouter.get('/active', (req, res) => {
-  db.Configuration.findOne({
-    where: { active: true },
-    include: includeArray
-  })
-    .then((configuration) => {
-      res.status(200).json({ configuration })
-    })
-    .catch((error) => handleDatabaseError(res, error))
-})
-
 configurationsRouter.get('/:id', async (req, res) => {
   try {
     const response = await db.Configuration.findByPk(req.params.id, {

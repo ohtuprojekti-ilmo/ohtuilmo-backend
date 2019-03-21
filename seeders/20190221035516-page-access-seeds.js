@@ -68,7 +68,6 @@ const initialRegistrationQuestionSet = [
 const initialConfiguration = [
   {
     name: 'Konfiguraatio 1',
-    active: true,
     registration_question_set_id: 1,
     created_at: new Date(),
     updated_at: new Date()

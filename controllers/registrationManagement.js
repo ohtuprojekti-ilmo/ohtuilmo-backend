@@ -22,14 +22,16 @@ const create = async (req, res) => {
 
 const isNil = (value) => value === undefined || value === null
 
-const validateRegistrationManagement = (registrationManagement) => {
+const validateRegistrationManagement = async (registrationManagement) => {
   if (!registrationManagement) {
     return 'All attributes must be defined'
   }
 
   const {
+    peer_review_conf,
     peer_review_open,
     peer_review_round,
+    project_registration_conf,
     project_registration_open,
     project_registration_message,
     project_registration_info,
@@ -38,8 +40,10 @@ const validateRegistrationManagement = (registrationManagement) => {
   } = registrationManagement
 
   if (
+    isNil(peer_review_conf) ||
     isNil(peer_review_open) ||
     isNil(peer_review_round) ||
+    isNil(project_registration_conf) ||
     isNil(project_registration_open) ||
     isNil(project_registration_message) ||
     isNil(project_registration_info) ||
@@ -61,13 +65,29 @@ const validateRegistrationManagement = (registrationManagement) => {
     return 'Message must be provided when topic registration is closed'
   }
 
+  const projectRegistrationConf = await db.Configuration.findOne({
+    where: { id: project_registration_conf }
+  })
+
+  if (!projectRegistrationConf) {
+    return 'Provided configuration for project registration does not exist'
+  }
+
+  const peerReviewConf = await db.Configuration.findOne({
+    where: { id: peer_review_conf }
+  })
+
+  if (!peerReviewConf) {
+    return 'Provided configuration for peer reviews does not exist'
+  }
+
   return null
 }
 
 registrationManagementRouter.post('/', checkAdmin, async (req, res) => {
   const { registrationManagement } = req.body
 
-  const error = validateRegistrationManagement(registrationManagement)
+  const error = await validateRegistrationManagement(registrationManagement)
   if (error) {
     return res.status(400).json({ error })
   }

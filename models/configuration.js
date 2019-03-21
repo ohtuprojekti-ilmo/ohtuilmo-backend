@@ -1,5 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const Configuration = sequelize.define('configuration',
+  const Configuration = sequelize.define(
+    'configuration',
     {
       id: {
         type: Sequelize.INTEGER,
@@ -11,10 +12,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       content: {
         type: Sequelize.JSONB
-      },
-      active: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
       }
     },
     {
@@ -22,10 +19,14 @@ module.exports = (sequelize, Sequelize) => {
     }
   )
 
-  Configuration.associate = models => {
+  Configuration.associate = (models) => {
     Configuration.hasMany(models.Registration) // used only for creating the foreign key in registrations, should be removed and implemented from registration side
-    Configuration.belongsTo(models.ReviewQuestionSet, { as: 'review_question_set_1' })
-    Configuration.belongsTo(models.ReviewQuestionSet, { as: 'review_question_set_2' })
+    Configuration.belongsTo(models.ReviewQuestionSet, {
+      as: 'review_question_set_1'
+    })
+    Configuration.belongsTo(models.ReviewQuestionSet, {
+      as: 'review_question_set_2'
+    })
     Configuration.belongsTo(models.RegistrationQuestionSet)
   }
 

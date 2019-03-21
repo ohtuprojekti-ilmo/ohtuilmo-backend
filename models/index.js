@@ -91,6 +91,16 @@ db.connect = () => {
     foreignKey: 'configuration_id'
   })
 
+  Configuration.hasOne(RegistrationManagement, {
+    as: 'peer_review_configuration',
+    foreignKey: 'peer_review_conf'
+  })
+
+  Configuration.hasOne(RegistrationManagement, {
+    as: 'project_registration_configuration',
+    foreignKey: 'project_registration_conf'
+  })
+
   db.Configuration.associate(db)
   db.Registration.associate(db)
 
