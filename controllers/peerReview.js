@@ -111,11 +111,14 @@ peerReviewRouter.post('/', checkLogin, async (req, res) => {
 
 peerReviewRouter.get('/', checkLogin, async (req, res) => {
   try {
-    const config = await db.Configuration.findOne({ where: { active: true } })
+    const registrationManagement = await db.RegistrationManagement.findOne({
+      order: [['createdAt', 'DESC']]
+    })
+
     const entries = await db.PeerReview.findAll({
       where: {
         user_id: req.user.id,
-        configuration_id: config.id
+        configuration_id: registrationManagement.peer_review_conf
       }
     })
 
