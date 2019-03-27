@@ -1,6 +1,8 @@
 const emailRouter = require('express').Router()
 const nodemailer = require('nodemailer')
+const db = require('../models/index')
 const config = require('../config/').email
+const { checkAdmin } = require('../middleware')
 
 const sendSecretLink = (secretId, address) => {
   const options = {
@@ -75,8 +77,7 @@ const send = (options) => {
   }
 }
 
-emailRouter.post('/send', (req, res) => {
-
+emailRouter.post('/send', checkAdmin, (req, res) => {
   switch (req.body.messageType) {
   case 'acceptEng':
     sendAcceptEng(req.body.address)
@@ -97,6 +98,43 @@ emailRouter.post('/send', (req, res) => {
   default:
     res.status(401).json({ error: 'unknown message type requested ' })
     break
+  }
+})
+
+const defaultEmailTemplates = {
+  topic_accepted_fin: '',
+  topic_rejected_fin: '',
+  topic_accepted_eng: '',
+  topic_rejected_eng: ''
+}
+
+const serializeTemplatesByLanguage = ({
+  topic_accepted_fin,
+  topic_rejected_fin,
+  topic_accepted_eng,
+  topic_rejected_eng
+}) => ({
+  topicAccepted: {
+    finnish: topic_accepted_fin,
+    english: topic_accepted_eng
+  },
+  topicRejected: {
+    finnish: topic_rejected_fin,
+    english: topic_rejected_eng
+  }
+})
+
+emailRouter.get('/templates', checkAdmin, async (req, res) => {
+  try {
+    const templates = await db.EmailTemplate.findAll({
+      limit: 1,
+      order: [['created_at', 'DESC']]
+    })
+
+    const payload = templates.length > 0 ? templates[0] : defaultEmailTemplates
+    return res.json(serializeTemplatesByLanguage(payload))
+  } catch (err) {
+    res.status(500).json({ error: 'database error' })
   }
 })
 
