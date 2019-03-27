@@ -286,14 +286,28 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
 
   try {
     const studentId = req.params.student
-    console.log('/bystudent/', studentId)
     const user = await db.User.findByPk(studentId)
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
     }
 
-    const groups = await user.getGroups({
+    const registrationManagement = await db.RegistrationManagement.findOne({
+      order: [['createdAt', 'DESC']]
+    })
+
+    const peerReviewConf = registrationManagement.peer_review_conf
+    const projectConf = registrationManagement.project_registration_conf
+
+    // return users groups where configuration is either on current
+    // peerreview or project registration configuration
+    const allGroups = await user.getGroups({
+      where: {
+        [Op.or]: [
+          { configurationId: peerReviewConf },
+          { configurationId: projectConf }
+        ]
+      },
       include: [
         {
           as: 'students',
@@ -304,9 +318,18 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
       ]
     })
 
-    if (!groups || groups.length === 0) {
+    if (!allGroups || allGroups.length === 0) {
       return res.status(200).json(null)
     }
+
+    const peerReviewGroup = allGroups.find(
+      (group) => group.configurationId === peerReviewConf
+    )
+    const projectGroup = allGroups.find(
+      (group) => group.configurationId === projectConf
+    )
+
+    const usersGroup = peerReviewGroup ? peerReviewGroup : projectGroup
 
     const extractCallingName = (firstNames) => {
       if (firstNames.includes('*')) {
@@ -315,8 +338,7 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
       return firstNames.split(' ')[0]
     }
 
-    const myGroup = groups[0]
-    const instructorName = await db.User.findByPk(myGroup.instructorId)
+    const instructorName = await db.User.findByPk(usersGroup.instructorId)
     const instructorString = instructorName
       ? extractCallingName(instructorName.first_names) +
         ' ' +
@@ -324,10 +346,10 @@ router.get('/bystudent/:student', checkLogin, async (req, res) => {
       : ''
 
     return res.status(200).json({
-      id: myGroup.id,
-      configurationId: myGroup.configurationId,
-      groupName: myGroup.name,
-      students: myGroup.students,
+      id: usersGroup.id,
+      configurationId: usersGroup.configurationId,
+      groupName: usersGroup.name,
+      students: usersGroup.students,
       instructor: instructorString
     })
   } catch (error) {

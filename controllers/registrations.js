@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const registrationsRouter = require('express').Router()
 const db = require('../models/index')
 const { checkAdmin, checkLogin } = require('../middleware')
@@ -139,13 +140,29 @@ registrationsRouter.get('/', checkLogin, async (req, res) => {
       order: [['createdAt', 'DESC']]
     })
 
-    const registration = await db.Registration.findOne({
+    const peerReviewConf = registrationManagement.peer_review_conf
+    const projectConf = registrationManagement.project_registration_conf
+
+    const registrations = await db.Registration.findAll({
       where: {
-        configuration_id: registrationManagement.project_registration_conf,
+        [Op.or]: [
+          { configuration_id: peerReviewConf },
+          { configuration_id: projectConf }
+        ],
         studentStudentNumber: loggedInUserStudentNumber
       },
       include: ['student']
     })
+
+    const peerReviewReg = registrations.find(
+      (registration) => registration.configuration_id === peerReviewConf
+    )
+
+    const projectReg = registrations.find(
+      (registration) => registration.configuration_id === projectConf
+    )
+
+    const registration = peerReviewReg ? peerReviewReg : projectReg
 
     if (!registration) {
       return res.status(204).send()
