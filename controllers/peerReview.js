@@ -162,6 +162,10 @@ peerReviewRouter.get('/forInstructor', checkLogin, async (req, res) => {
         {
           as: 'configuration',
           model: db.Configuration
+        },
+        {
+          as: 'instructor',
+          model: db.User
         }
       ]
     })
@@ -204,7 +208,10 @@ peerReviewRouter.get('/forInstructor', checkLogin, async (req, res) => {
               (student) => student.first_names + ' ' + student.last_name
             ),
             configurationId: group.configurationId,
-            configurationName: group.configuration.name
+            configurationName: group.configuration.name,
+            instructorName: group.instructor
+              ? group.instructor.first_names + ' ' + group.instructor.last_name
+              : ''
           },
           round1Answers,
           round2Answers
