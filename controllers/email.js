@@ -5,10 +5,8 @@ const config = require('../config/').email
 const sendSecretLink = (secretId, address) => {
   const options = {
     to: address,
-    subject: '[Software engineering project] project proposal',
-    html:
-      'Thank you for the project proposal. You can use the below link to view or edit your proposal. \n \
-          <a href="http://studies.cs.helsinki.fi/projekti/topics/' + secretId + '">Edit your submission</a>'
+    subject: '[Software engineering project] Project proposal confirmation',
+    html: `Thank you for the project proposal. You can use the below link to view or edit your proposal. \n <a href="http://studies.cs.helsinki.fi/projekti/topics/${secretId}">Edit your submission</a>`
   }
   send(options)
 }
@@ -66,7 +64,7 @@ const send = (options) => {
     html: options.html
   }
 
-  if (process.env.NODE_ENV === 'PRODUCTION') {
+  if (process.env.NODE_ENV === 'production') {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error)
@@ -103,5 +101,6 @@ emailRouter.post('/send', (req, res) => {
 })
 
 module.exports = {
-  emailRouter, sendSecretLink
+  emailRouter,
+  sendSecretLink
 }
