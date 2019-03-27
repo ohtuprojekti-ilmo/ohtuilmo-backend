@@ -228,4 +228,29 @@ peerReviewRouter.get('/forInstructor', checkLogin, async (req, res) => {
   }
 })
 
+peerReviewRouter.delete('/:id', checkAdmin, async (req, res) => {
+  const peerReviewId = parseInt(req.params.id, 10)
+  if (isNaN(peerReviewId)) {
+    return res.status(400).json({ error: 'invalid id' })
+  }
+
+  try {
+    const targetSet = await db.PeerReview.findByPk(peerReviewId)
+    if (!targetSet) {
+      // already deleted, eh, just return ok
+      return res.status(204).end()
+    }
+
+    await targetSet.destroy()
+    return res.status(204).end()
+  } catch (err) {
+    console.error(
+      'error while deleting question set with id',
+      req.params.id,
+      err
+    )
+    return res.status(500).json({ error: 'internal server error' })
+  }
+})
+
 module.exports = peerReviewRouter
