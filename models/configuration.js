@@ -28,6 +28,7 @@ module.exports = (sequelize, Sequelize) => {
       as: 'review_question_set_2'
     })
     Configuration.belongsTo(models.RegistrationQuestionSet)
+    Configuration.belongsTo(models.CustomerReviewQuestionSet) /* , { as: 'customer_review_question_set' } */
   }
 
   return Configuration

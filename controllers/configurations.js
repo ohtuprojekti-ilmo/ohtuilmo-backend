@@ -34,7 +34,7 @@ const setForeignKeys = async (configuration, req, res) => {
       if (!foundSet)
         return res
           .status(400)
-          .json({ error: 'no review question set with that id' })
+          .json({ error: 'no peer review question set with that id' })
       await configuration.setReview_question_set_1(
         req.body.review_question_set_1_id
       )
@@ -46,7 +46,7 @@ const setForeignKeys = async (configuration, req, res) => {
       if (!foundSet)
         return res
           .status(400)
-          .json({ error: 'no review question set with that id' })
+          .json({ error: 'no peer review question set with that id' })
       await configuration.setReview_question_set_2(
         req.body.review_question_set_2_id
       )
@@ -61,6 +61,18 @@ const setForeignKeys = async (configuration, req, res) => {
           .json({ error: 'no registration question set with that id' })
       await configuration.setRegistration_question_set(
         req.body.registration_question_set_id
+      )
+    }
+    if (req.body.customer_review_question_set_id) {
+      const foundSet = await db.CustomerReviewQuestionSet.findOne({
+        where: { id: req.body.customer_review_question_set_id }
+      })
+      if (!foundSet)
+        return res
+          .status(400)
+          .json({ error: 'no customer review question set with that id' })
+      await configuration.setCustomer_review_question_set(
+        req.body.customer_review_question_set_id
       )
     }
     returnPopulatedConfiguration(req, res, configuration)
@@ -181,6 +193,19 @@ configurationsRouter.get(
       } else {
         res.status(400).json({ error: 'bad review round' })
       }
+    } catch (error) {
+      handleDatabaseError(res, error)
+    }
+  }
+)
+
+configurationsRouter.get('/:id/customerreviewquestions',
+  async (req, res) => {
+    try {
+      const response = await db.Configuration.findByPk(req.params.id, {
+        include: 'customer_review_question_set'
+      })
+      res.status(200).json(response.customer_review_question_set)
     } catch (error) {
       handleDatabaseError(res, error)
     }
