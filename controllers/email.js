@@ -124,6 +124,13 @@ const serializeTemplatesByLanguage = ({
   }
 })
 
+const deserializeTemplatesByLanguage = ({ topicAccepted, topicRejected }) => ({
+  topic_accepted_fin: topicAccepted.finnish,
+  topic_rejected_fin: topicRejected.finnish,
+  topic_accepted_eng: topicAccepted.english,
+  topic_rejected_eng: topicRejected.english
+})
+
 emailRouter.get('/templates', checkAdmin, async (req, res) => {
   try {
     const templates = await db.EmailTemplate.findAll({
@@ -137,6 +144,73 @@ emailRouter.get('/templates', checkAdmin, async (req, res) => {
     res.status(500).json({ error: 'database error' })
   }
 })
+
+const isNil = (value) => value === undefined || value === null
+
+const validateTemplates = (body) => {
+  if (!body) {
+    return 'All attributes must be defined'
+  }
+
+  const { topicAccepted, topicRejected } = body
+  // allow empty strings!
+  if (
+    isNil(topicAccepted) ||
+    isNil(topicRejected) ||
+    isNil(topicAccepted.finnish) ||
+    isNil(topicAccepted.english) ||
+    isNil(topicRejected.finnish) ||
+    isNil(topicRejected.english)
+  ) {
+    return 'All attributes must be defined'
+  }
+
+  return null
+}
+
+const validateAndParseTemplates = (req, res, next) => {
+  try {
+    const validationError = validateTemplates(req.body)
+    if (validationError) {
+      return res.status(400).json({ error: validationError })
+    }
+
+    const deserialized = deserializeTemplatesByLanguage(req.body)
+    req.locals = {
+      ...req.locals,
+      templates: deserialized
+    }
+    next()
+  } catch (e) {
+    res.status(500).json({ error: 'internal server error' })
+  }
+}
+
+emailRouter.post(
+  '/templates',
+  checkAdmin,
+  validateAndParseTemplates,
+  async (req, res) => {
+    const {
+      topic_accepted_fin,
+      topic_rejected_fin,
+      topic_accepted_eng,
+      topic_rejected_eng
+    } = req.locals.templates
+
+    try {
+      const createdTemplates = await db.EmailTemplate.create({
+        topic_accepted_fin,
+        topic_rejected_fin,
+        topic_accepted_eng,
+        topic_rejected_eng
+      })
+      res.status(200).json(serializeTemplatesByLanguage(createdTemplates))
+    } catch (e) {
+      res.status(500).json({ error: 'database error' })
+    }
+  }
+)
 
 module.exports = {
   emailRouter,
