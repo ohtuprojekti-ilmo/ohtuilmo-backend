@@ -136,4 +136,96 @@ peerReviewRouter.get('/all', checkAdmin, async (req, res) => {
   }
 })
 
+peerReviewRouter.get('/forInstructor', checkLogin, async (req, res) => {
+  try {
+    const instructedGroups = await db.Group.findAll({
+      where: { instructorId: req.user.id }
+    })
+
+    if (instructedGroups.length === 0) {
+      return res.status(401).json({ error: 'Not instructor' })
+    }
+
+    const instructedConfigurations = instructedGroups.map(
+      (group) => group.configurationId
+    )
+
+    const groupsOfInstructedConfigurations = await db.Group.findAll({
+      where: { configurationId: instructedConfigurations },
+      include: [
+        {
+          as: 'students',
+          model: db.User,
+          attributes: ['student_number', 'first_names', 'last_name'],
+          through: { attributes: [] }
+        },
+        {
+          as: 'configuration',
+          model: db.Configuration
+        },
+        {
+          as: 'instructor',
+          model: db.User
+        }
+      ]
+    })
+
+    const allAnswers = await db.PeerReview.findAll({
+      include: ['user']
+    })
+
+    const filterAndFormatAnswers = (answers, group, round) => {
+      return answers
+        .filter(
+          (answer) =>
+            group.students
+              .map(({ student_number }) => student_number)
+              .includes(answer.user.student_number) &&
+            answer.configuration_id === group.configurationId &&
+            answer.review_round === round
+        )
+        .map((answer) => {
+          return {
+            student: {
+              first_names: answer.user.first_names,
+              last_name: answer.user.last_name
+            },
+            answer_sheet: answer.answer_sheet
+          }
+        })
+    }
+
+    const answersByGroup = groupsOfInstructedConfigurations.reduce(
+      (list, group) => {
+        const round1Answers = filterAndFormatAnswers(allAnswers, group, 1)
+        const round2Answers = filterAndFormatAnswers(allAnswers, group, 2)
+
+        list = list.concat({
+          group: {
+            id: group.id,
+            name: group.name,
+            studentNames: group.students.map(
+              (student) => student.first_names + ' ' + student.last_name
+            ),
+            configurationId: group.configurationId,
+            configurationName: group.configuration.name,
+            instructorName: group.instructor
+              ? group.instructor.first_names + ' ' + group.instructor.last_name
+              : ''
+          },
+          round1Answers,
+          round2Answers
+        })
+
+        return list
+      },
+      []
+    )
+
+    return res.status(200).json(answersByGroup)
+  } catch (error) {
+    return handleDatabaseError(res, error)
+  }
+})
+
 module.exports = peerReviewRouter
