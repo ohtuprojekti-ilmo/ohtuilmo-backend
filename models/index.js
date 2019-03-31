@@ -101,6 +101,16 @@ db.connect = () => {
     foreignKey: 'project_registration_conf'
   })
 
+  Configuration.hasOne(RegistrationManagement, {
+    as: 'topic_registration_configuration',
+    foreignKey: 'topic_registration_conf'
+  })
+
+  Topic.belongsTo(Configuration, {
+    as: 'configuration',
+    foreignKey: 'configuration_id'
+  })
+
   db.Configuration.associate(db)
   db.Registration.associate(db)
 

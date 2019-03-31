@@ -35,6 +35,7 @@ const validateRegistrationManagement = async (registrationManagement) => {
     project_registration_open,
     project_registration_message,
     project_registration_info,
+    topic_registration_conf,
     topic_registration_open,
     topic_registration_message
   } = registrationManagement
@@ -47,6 +48,7 @@ const validateRegistrationManagement = async (registrationManagement) => {
     isNil(project_registration_open) ||
     isNil(project_registration_message) ||
     isNil(project_registration_info) ||
+    isNil(topic_registration_conf) ||
     isNil(topic_registration_open) ||
     isNil(topic_registration_message)
   ) {
@@ -65,20 +67,30 @@ const validateRegistrationManagement = async (registrationManagement) => {
     return 'Message must be provided when topic registration is closed'
   }
 
-  const projectRegistrationConf = await db.Configuration.findOne({
-    where: { id: project_registration_conf }
-  })
+  const allConfigurations = await db.Configuration.findAll({})
+
+  const projectRegistrationConf = allConfigurations.find(
+    (configuration) => configuration.id === project_registration_conf
+  )
 
   if (!projectRegistrationConf) {
     return 'Provided configuration for project registration does not exist'
   }
 
-  const peerReviewConf = await db.Configuration.findOne({
-    where: { id: peer_review_conf }
-  })
+  const peerReviewConf = allConfigurations.find(
+    (configuration) => configuration.id === peer_review_conf
+  )
 
   if (!peerReviewConf) {
     return 'Provided configuration for peer reviews does not exist'
+  }
+
+  const topicRegistrationConf = allConfigurations.find(
+    (configuration) => configuration.id === topic_registration_conf
+  )
+
+  if (!topicRegistrationConf) {
+    return 'Provided configuration for topic registration does not exist'
   }
 
   return null

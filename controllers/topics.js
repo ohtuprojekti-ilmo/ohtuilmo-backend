@@ -39,9 +39,18 @@ const registrationCheck = async (req, res, next) => {
 topicsRouter.post('/', registrationCheck, (req, res) => {
   if (!req.body.content)
     return res.status(400).json({ error: 'content undefined' })
+
+  if (!req.body.configuration_id) {
+    return res
+      .status(400)
+      .json({ error: 'Topic must be associated with configuration' })
+  }
+
   const secret_id = getRandomId()
 
   db.Topic.create({
+    active: true,
+    configuration_id: req.body.configuration_id,
     content: req.body.content,
     acronym: req.body.acronym,
     secret_id
@@ -142,21 +151,32 @@ topicsRouter.get('/', checkAdmin, (req, res) => {
     })
 })
 
-topicsRouter.get('/active', (req, res) => {
-  db.Topic.findAll({
-    where: {
-      active: true
+topicsRouter.get('/active', async (req, res) => {
+  try {
+    const registrationManagement = await db.RegistrationManagement.findOne({
+      order: [['createdAt', 'DESC']]
+    })
+
+    if (!registrationManagement) {
+      return res
+        .status(400)
+        .json({ error: 'no active configuration for topic registration' })
     }
-  })
-    .then((topics) => {
-      res.status(200).json({
-        topics: shuffle(topics.map((topic) => format(topic)))
-      })
+
+    const activeTopics = await db.Topic.findAll({
+      where: {
+        active: true,
+        configuration_id: registrationManagement.topic_registration_conf
+      }
     })
-    .catch((error) => {
-      console.log(error)
-      res.status(500).json({ error: 'database error' })
+
+    return res.status(200).json({
+      topics: shuffle(activeTopics.map((topic) => format(topic)))
     })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'database error' })
+  }
 })
 
 topicsRouter.get('/:id', (req, res) => {
