@@ -2,12 +2,18 @@
 
 const initialRegistrationManagement = [
   {
+    project_registration_conf: 1,
     project_registration_open: true,
-    project_registration_message: '',
+    project_registration_message:
+      'Project registration will open on DD.MM.YYYY.',
     project_registration_info:
       'Project registration will be open until DD.MM.YYYY.',
+    topic_registration_conf: 1,
     topic_registration_open: true,
-    topic_registration_message: ''
+    topic_registration_message: 'Topic registration will open on DD.MM.YYYY.',
+    peer_review_conf: 1,
+    peer_review_open: true,
+    peer_review_round: 1
   }
 ]
 
@@ -87,7 +93,8 @@ const initialTopic = [
       additionalInfo: 'Joku hyvä lisätieto',
       specialRequests: 'Joku hyvä erityistoive'
     }),
-    secret_id: 'eec0neeT0jo0ae9F'
+    secret_id: 'eec0neeT0jo0ae9F',
+    configuration_id: 1
   }
 ]
 
@@ -105,7 +112,8 @@ const initialPreferredTopics = [
       additionalInfo: 'Joku hyvä lisätieto',
       specialRequests: 'Joku hyvä erityistoive'
     },
-    secret_id: 'eec0neeT0jo0ae9F'
+    secret_id: 'eec0neeT0jo0ae9F',
+    configuration_id: 1
   }
 ]
 
@@ -130,11 +138,6 @@ const addTimeStamps = (arr) => {
 
 module.exports = {
   up: async (query) => {
-    await query.bulkInsert(
-      'registration_managements',
-      addTimeStamps(initialRegistrationManagement),
-      {}
-    )
     await query.bulkInsert('users', addTimeStamps(initialUsers), {})
     await query.bulkInsert(
       'registration_question_sets',
@@ -142,6 +145,11 @@ module.exports = {
       {}
     )
     await query.bulkInsert('configurations', initialConfiguration, {})
+    await query.bulkInsert(
+      'registration_managements',
+      addTimeStamps(initialRegistrationManagement),
+      {}
+    )
     await query.bulkInsert('topics', addTimeStamps(initialTopic), {})
     await query.bulkInsert(
       'registrations',

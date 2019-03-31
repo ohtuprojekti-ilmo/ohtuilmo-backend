@@ -14,6 +14,7 @@ const additionalTopic = [
       specialRequests: 'Joku hyvä erityistoive'
     }),
     secret_id: 'Coh5boozeyish7iS',
+    configuration_id: 1,
     createdAt: new Date(),
     updatedAt: new Date()
   }
