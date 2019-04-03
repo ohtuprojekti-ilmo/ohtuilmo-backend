@@ -143,10 +143,41 @@ customerReviewRouter.get('/:id', async (req, res) => {
 
     //data tulee läpi
 
+    const checkAnswer = await db.CustomerReview.findOne({
+      where: {
+        group_id: group.id
+      }
+    })
+
+    let hasAnswered = false
+
+    if (checkAnswer) {
+      hasAnswered = true
+    }
+
+    /*       if(!checkAnswer){
+        res.status(200).json({
+          groupId: group.id,
+          groupName: group.name,
+          configuration: group.configurationId,
+          hasAnswered: false
+        })
+      }
+
+      if(checkAnswer){
+        res.status(200).json({
+          groupId: group.id,
+          groupName: group.name,
+          configuration: group.configurationId,
+          hasAnswered: true
+        })
+      } */
+
     res.status(200).json({
       groupId: group.id,
       groupName: group.name,
-      configuration: group.configurationId
+      configuration: group.configurationId,
+      hasAnswered: hasAnswered
     })
   } catch (error) {
     console.error('Error while updating group', error)
