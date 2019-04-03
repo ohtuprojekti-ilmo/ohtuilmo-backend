@@ -228,6 +228,11 @@ emailRouter.post(
   }
 )
 
+emailRouter.delete('/templates', checkAdmin, async (req, res) => {
+  await db.EmailTemplate.destroy({ where: {} })
+  res.status(204).end()
+})
+
 module.exports = {
   emailRouter,
   sendSecretLink
