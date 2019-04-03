@@ -1,69 +1,33 @@
 const emailRouter = require('express').Router()
 const nodemailer = require('nodemailer')
 const db = require('../models/index')
-const config = require('../config/').email
+const emailConfig = require('../config/').email
 const { checkAdmin } = require('../middleware')
 
 const sendSecretLink = (secretId, address) => {
   const options = {
     to: address,
-    subject: '[Software engineering project] Project proposal confirmation',
+    subject: emailConfig.subjects.secretLink,
     html: `Thank you for the project proposal. You can use the below link to view or edit your proposal. \n <a href="http://studies.cs.helsinki.fi/projekti/topics/${secretId}">Edit your submission</a>`
   }
   send(options)
 }
 
-const sendAcceptEng = (address) => {
-  const options = {
-    to: address,
-    subject: config.acceptEng.subject,
-    html: config.acceptEng.html
-  }
-  send(options)
-}
-
-const sendRejectEng = (address) => {
-  const options = {
-    to: address,
-    subject: config.rejectEng.subject,
-    html: config.rejectEng.html
-  }
-  send(options)
-}
-
-const sendAcceptFin = (address) => {
-  const options = {
-    to: address,
-    subject: config.acceptFin.subject,
-    html: config.acceptFin.html
-  }
-  send(options)
-}
-
-const sendRejectFin = (address) => {
-  const options = {
-    to: address,
-    subject: config.rejectFin.subject,
-    html: config.rejectFin.html
-  }
-  send(options)
-}
-
-const send = (options) => {
+const send = (to, subject, html, text) => {
   const transporter = nodemailer.createTransport({
-    host: config.general.host,
-    port: config.general.port,
-    secure: config.general.secure
+    host: emailConfig.general.host,
+    port: emailConfig.general.port,
+    secure: emailConfig.general.secure
   })
 
   const mailOptions = {
-    from: config.general.sender,
-    to: options.to,
-    replyTo: config.general.replyTo,
-    cc: config.general.cc,
-    subject: options.subject,
-    text: options.text,
-    html: options.html
+    from: emailConfig.general.sender,
+    to: to,
+    replyTo: emailConfig.general.replyTo,
+    cc: emailConfig.general.cc,
+    subject: subject,
+    text: text,
+    html: html
   }
 
   if (process.env.NODE_ENV === 'production') {
@@ -77,28 +41,80 @@ const send = (options) => {
   }
 }
 
-emailRouter.post('/send', checkAdmin, (req, res) => {
-  switch (req.body.messageType) {
-  case 'acceptEng':
-    sendAcceptEng(req.body.address)
-    res.status(200).json({ message: 'sending email' })
-    break
-  case 'rejectEng':
-    sendRejectEng(req.body.address)
-    res.status(200).json({ message: 'sending email' })
-    break
-  case 'acceptFin':
-    sendAcceptFin(req.body.address)
-    res.status(200).json({ message: 'sending email' })
-    break
-  case 'rejectFin':
-    sendRejectFin(req.body.address)
-    res.status(200).json({ message: 'sending email' })
-    break
-  default:
-    res.status(401).json({ error: 'unknown message type requested ' })
-    break
+const validateBody = (body) => {
+  if (!body) {
+    return 'All attributes must be defined'
   }
+
+  if (!body.address) {
+    return 'address is required'
+  }
+
+  if (!body.messageType) {
+    return 'messageType is required'
+  }
+
+  if (
+    body.messageType !== 'topicAccepted' &&
+    body.messageType !== 'topicRejected'
+  ) {
+    return 'invalid messageType'
+  }
+
+  if (
+    body.messageLanguage !== 'finnish' &&
+    body.messageLanguage !== 'english'
+  ) {
+    return 'invalid messageLanguage'
+  }
+
+  if (!body.templateContext || !body.templateContext.topicName) {
+    return 'topicName required in templateContext'
+  }
+
+  return null
+}
+
+const validateSendBody = async (req, res, next) => {
+  const validationError = validateBody(req.body)
+  if (validationError) {
+    return res.status(400).json({ error: validationError })
+  }
+
+  next()
+}
+
+const msgTypeToDbColumnMapping = {
+  topicAccepted: {
+    finnish: 'topic_accepted_fin',
+    english: 'topic_accepted_eng'
+  },
+  topicRejected: {
+    finnish: 'topic_rejected_fin',
+    english: 'topic_rejected_eng'
+  }
+}
+
+emailRouter.post('/send', checkAdmin, validateSendBody, async (req, res) => {
+  const templates = await db.EmailTemplate.findOne({
+    order: [['created_at', 'DESC']]
+  })
+
+  if (!templates) {
+    return res
+      .status(400)
+      .json({ error: 'email templates have not been configured' })
+  }
+
+  const { address, messageType, messageLanguage, templateContext } = req.body
+
+  const dbTemplateName = msgTypeToDbColumnMapping[messageType][messageLanguage]
+
+  const renderedEmail = templates.render(dbTemplateName, templateContext)
+  const subject = emailConfig.subjects[messageType][messageLanguage]
+
+  send(address, subject, null, renderedEmail)
+  res.status(200).end()
 })
 
 const defaultEmailTemplates = {

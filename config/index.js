@@ -2,15 +2,18 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-let port = process.env.PORT
-let dbUrl = process.env.DATABASE_URI
+const port = process.env.PORT
+const dbUrl = process.env.DATABASE_URI
 
-let login = 'http://opetushallinto.cs.helsinki.fi/login'
+const login = 'http://opetushallinto.cs.helsinki.fi/login'
 
-let secret = process.env.SECRET
+const secret = process.env.SECRET
 
-// default email config
-let email = {
+const makeSubjectFin = (subject) => `[Ohjelmistotuotantoprojekti] ${subject}`
+const makeSubjectEng = (subject) => `[Software engineering project] ${subject}`
+
+const email = {
+  // default email config
   general: {
     sender: 'Ohtuilmo Robot <noreply@helsinki.fi>',
     host: 'smtp.helsinki.fi',
@@ -19,21 +22,16 @@ let email = {
     replyTo: 'mluukkai@cs.helsinki.fi',
     cc: 'mluukkai@cs.helsinki.fi'
   },
-  acceptEng: {
-    subject: 'acceptEng test',
-    html: '<h1>test</h1>'
-  },
-  rejectEng: {
-    subject: 'rejectEng test',
-    html: '<h1>test</h1>'
-  },
-  acceptFin: {
-    subject: 'acceptFin testi',
-    html: '<h1>testi</h1>'
-  },
-  rejectFin: {
-    subject: 'rejectFin testi',
-    html: '<h1>testi</h1>'
+  subjects: {
+    topicAccepted: {
+      finnish: makeSubjectFin('Aihe-ehdotuksesi on hyväksytty'),
+      english: makeSubjectEng('Your topic proposal has been accepted')
+    },
+    topicRejected: {
+      finnish: makeSubjectFin('Aihe-ehdotustasi ei valittu'),
+      english: makeSubjectEng('Your topic proposal was not selected')
+    },
+    secretLink: makeSubjectEng('Project proposal confirmation')
   }
 }
 

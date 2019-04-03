@@ -1,4 +1,8 @@
 'use strict'
+
+const replaceTopicName = (template, replacement) =>
+  template.replace(/{{topicName}}/g, replacement)
+
 module.exports = (sequelize, DataTypes) => {
   const EmailTemplate = sequelize.define(
     'email_templates',
@@ -12,6 +16,12 @@ module.exports = (sequelize, DataTypes) => {
       underscored: true
     }
   )
+
+  EmailTemplate.prototype.render = function render(templateName, context) {
+    const template = this.getDataValue(templateName)
+    const { topicName } = context
+    return replaceTopicName(template, topicName)
+  }
 
   return EmailTemplate
 }
