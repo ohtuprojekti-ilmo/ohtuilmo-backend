@@ -34,6 +34,7 @@ db.connect = () => {
   const RegistrationManagementModel = require('./registration_management')
   const PeerReviewModel = require('./peer_review')
   const EmailTemplateModel = require('./email_template')
+  const InstructorReviewModel = require('./instructor_review')
 
   const CustomerReviewModel = require('./customer_review')
 
@@ -61,6 +62,7 @@ db.connect = () => {
   const PeerReview = PeerReviewModel(sequelize, Sequelize)
   const EmailTemplate = EmailTemplateModel(sequelize, Sequelize)
   const CustomerReview = CustomerReviewModel(sequelize, Sequelize)
+  const InstructorReview = InstructorReviewModel(sequelize, Sequelize)
 
   db.User = User
   db.Group = Group
@@ -76,6 +78,7 @@ db.connect = () => {
   db.RegistrationManagement = RegistrationManagement
   db.PeerReview = PeerReview
   db.EmailTemplate = EmailTemplate
+  db.InstructorReview = InstructorReview
 
   db.CustomerReview = CustomerReview
 
@@ -145,6 +148,15 @@ db.connect = () => {
     foreignKey: 'configuration_id'
   })
 
+  InstructorReview.belongsTo(User, {
+    as: 'user',
+    foreignKey: 'user_id'
+  })
+
+  InstructorReview.belongsTo(Configuration, {
+    as: 'configuration',
+    foreignKey: 'configuration_id'
+  })
   db.Configuration.associate(db)
   db.Registration.associate(db)
 
