@@ -75,7 +75,7 @@ const validateNumberAnswer = (question) => {
 const create = async (req, res) => {
   const { instructorReview } = req.body
   try {
-    const sentAnswerSheet = await db.PeerReview.create(instructorReview)
+    const sentAnswerSheet = await db.InstructorReview.create(instructorReview)
     return res.status(201).json(sentAnswerSheet)
   } catch (err) {
     return handleDatabaseError(res, err)
@@ -100,7 +100,7 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
 instructorReviewRouter.get('/', checkLogin, async (req, res) => {
   try {
     const config = await db.Configuration.findOne({ where: { active: true } })
-    const entries = await db.PeerReview.findAll({
+    const entries = await db.InstructorReview.findAll({
       where: {
         user_id: req.user.id,
         configuration_id: config.id
@@ -115,7 +115,7 @@ instructorReviewRouter.get('/', checkLogin, async (req, res) => {
 
 instructorReviewRouter.get('/all', checkAdmin, async (req, res) => {
   try {
-    const reviews = await db.PeerReview.findAll({
+    const reviews = await db.InstructorReview.findAll({
       include: ['user']
     })
     return res.status(200).json(reviews)
@@ -158,7 +158,7 @@ instructorReviewRouter.get('/forInstructor', checkLogin, async (req, res) => {
       ]
     })
 
-    const allAnswers = await db.PeerReview.findAll({
+    const allAnswers = await db.InstructorReview.findAll({
       include: ['user']
     })
 
@@ -223,7 +223,7 @@ instructorReviewRouter.delete('/:id', checkAdmin, async (req, res) => {
   }
 
   try {
-    const targetSet = await db.PeerReview.findByPk(instructorReviewId)
+    const targetSet = await db.InstructorReview.findByPk(instructorReviewId)
     if (!targetSet) {
       // already deleted, eh, just return ok
       return res.status(204).end()
