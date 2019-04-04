@@ -138,7 +138,8 @@ customerReviewRouter.get('/:id', async (req, res) => {
     })
 
     if (!group) {
-      return res.status(400).json({ error: 'no group found for topic' })
+      return res.status(200).json(null)
+      /* return res.status(400).json({ error: 'no group found for topic' }) */
     }
 
     //data tulee läpi
