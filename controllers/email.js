@@ -30,15 +30,34 @@ const send = (to, subject, html, text) => {
     html: html
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV !== 'production') {
+    return Promise.resolve()
+  }
+
+  return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.log(error)
-      } else {
-        console.log('sent: ', info)
+        console.error(error)
+        reject(error)
+        return
       }
+
+      if (info.rejected.length > 0) {
+        const rejectedEmails = info.rejected.join(', ')
+        const error = new Error(
+          `SMTP server rejected the following recipients: ${rejectedEmails}`
+        )
+
+        console.error(error)
+        console.error(info)
+        reject(error)
+        return
+      }
+
+      console.log('email sent', info)
+      resolve(info)
     })
-  }
+  })
 }
 
 const validateBody = (body) => {
@@ -113,8 +132,12 @@ emailRouter.post('/send', checkAdmin, validateSendBody, async (req, res) => {
   const renderedEmail = templates.render(dbTemplateName, templateContext)
   const subject = emailConfig.subjects[messageType][messageLanguage]
 
-  send(address, subject, null, renderedEmail)
-  res.status(200).end()
+  try {
+    await send(address, subject, null, renderedEmail)
+    res.status(200).end()
+  } catch (e) {
+    res.status(500).json({ error: e.message, details: e })
+  }
 })
 
 const defaultEmailTemplates = {
