@@ -13,7 +13,7 @@ const makeSubjectFin = (subject) => `[Ohjelmistotuotantoprojekti] ${subject}`
 const makeSubjectEng = (subject) => `[Software engineering project] ${subject}`
 
 const email = {
-  // default email config
+  isEnabled: process.env.EMAIL_ENABLED === 'true',
   general: {
     sender: 'Ohtuilmo Robot <noreply@helsinki.fi>',
     host: 'smtp.helsinki.fi',

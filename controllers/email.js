@@ -30,7 +30,8 @@ const send = (to, subject, html, text) => {
     html: html
   }
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (!emailConfig.isEnabled) {
+    console.log('Email not enabled with EMAIL_ENABLED=true, skipping mail')
     return Promise.resolve()
   }
 

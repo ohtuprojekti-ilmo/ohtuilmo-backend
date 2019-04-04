@@ -7,6 +7,17 @@ Clone and run:
 ## Instructions
 [How to start frontend, backend and database using docker-compose](https://github.com/ohtuprojekti-ilmo/ohtuilmo-frontend/wiki)
 
+## Environment variables
+
+In addition to the the usual `NODE_ENV`:
+
+Variable | Description
+--- | ---
+PORT | Port number to which the HTTP server will bind.
+DATABASE_URI | The PostgreSQL connection string.
+SECRET | JWT signing secret key. Change to invalidate all tokens.
+EMAIL_ENABLED | Set to `true` to enable admin's email sending functionality. Connection settings are found in `config/index.js`.
+
 ## Deploying to production
 
 Travis automatically builds a new Docker image when new commits are pushed to master. This image is then pushed to DockerHub under [`ohtuprojektiilmo/ohtuback`](https://hub.docker.com/r/ohtuprojektiilmo/ohtuback).
