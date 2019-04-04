@@ -109,13 +109,17 @@ const updateChecks = async (req, res) => {
   if (!req.body.name) return res.status(400).json({ error: 'name undefined' })
 
   try {
-    const configuration = await db.Configuration.findOne({
+    const duplicateName = await db.Configuration.findOne({
       where: { name: req.body.name }
     })
 
-    if (configuration && configuration.id !== parseInt(req.params.id)) {
+    if (duplicateName && duplicateName.id !== parseInt(req.params.id)) {
       return res.status(400).json({ error: 'name already in use' })
     }
+
+    const configuration = await db.Configuration.findOne({
+      where: { id: req.params.id }
+    })
 
     if (!configuration) {
       return res
