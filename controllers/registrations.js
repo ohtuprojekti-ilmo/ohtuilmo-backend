@@ -154,20 +154,10 @@ registrationsRouter.get('/', checkLogin, async (req, res) => {
       include: ['student']
     })
 
-    const peerReviewReg = registrations.find(
-      (registration) => registration.configuration_id === peerReviewConf
-    )
-
-    const projectReg = registrations.find(
-      (registration) => registration.configuration_id === projectConf
-    )
-
-    const registration = peerReviewReg ? peerReviewReg : projectReg
-
-    if (!registration) {
+    if (!registrations) {
       return res.status(204).send()
     }
-    return res.status(200).json({ registration: registration })
+    return res.status(200).json({ registrations })
   } catch (error) {
     handleDatabaseError(res, error)
   }
