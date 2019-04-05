@@ -151,6 +151,9 @@ topicsRouter.get('/', checkAdmin, (req, res) => {
     })
 })
 
+/**
+ * Active topics for project registration
+ */
 topicsRouter.get('/active', async (req, res) => {
   try {
     const registrationManagement = await db.RegistrationManagement.findOne({
@@ -160,13 +163,13 @@ topicsRouter.get('/active', async (req, res) => {
     if (!registrationManagement) {
       return res
         .status(400)
-        .json({ error: 'no active configuration for topic registration' })
+        .json({ error: 'no active configuration for project registration' })
     }
 
     const activeTopics = await db.Topic.findAll({
       where: {
         active: true,
-        configuration_id: registrationManagement.topic_registration_conf
+        configuration_id: registrationManagement.project_registration_conf
       }
     })
 
