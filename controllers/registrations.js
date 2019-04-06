@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const registrationsRouter = require('express').Router()
 const db = require('../models/index')
 const { checkAdmin, checkLogin } = require('../middleware')
@@ -28,55 +29,69 @@ const registrationCheck = async (req, res, next) => {
   }
 }
 
-registrationsRouter.post('/', checkLogin, registrationCheck, (req, res) => {
-  if (!req.body.questions)
-    return res.status(400).json({ error: 'questions missing' })
-  if (!req.body.preferred_topics)
-    return res.status(400).json({ error: 'preferred_topics missing' })
-  const loggedInUserStudentNumber = req.user.id
+registrationsRouter.post(
+  '/',
+  checkLogin,
+  registrationCheck,
+  async (req, res) => {
+    if (!req.body.questions)
+      return res.status(400).json({ error: 'questions missing' })
+    if (!req.body.preferred_topics)
+      return res.status(400).json({ error: 'preferred_topics missing' })
+    const loggedInUserStudentNumber = req.user.id
 
-  db.User.findOne({ where: { student_number: loggedInUserStudentNumber } })
-    .then((user) => {
-      if (!user) return res.status(400).json({ error: 'student not found' })
+    try {
+      const user = await db.User.findOne({
+        where: { student_number: loggedInUserStudentNumber }
+      })
 
-      db.Configuration.findOne({ where: { active: true } })
-        .then((config) => {
-          if (!config)
-            return res
-              .status(400)
-              .json({ error: 'no active configuration found' })
-          db.Registration.findAll({
-            where: { configuration_id: config.id }
-          }).then((registrations) => {
-            const existingRegistration = registrations.find(
-              (e) => e.studentStudentNumber === loggedInUserStudentNumber
-            )
-            if (existingRegistration)
-              return res
-                .status(400)
-                .json({ error: 'student already registered' })
-            db.Registration.create({
-              preferred_topics: req.body.preferred_topics,
-              questions: req.body.questions,
-              configuration_id: config.id
-            })
-              .then(async (registration) => {
-                try {
-                  await registration.setStudent(loggedInUserStudentNumber)
-                } catch (error) {
-                  handleDatabaseError(res, error)
-                }
-                res.status(200).json({ registration })
-              })
-              .catch((error) => handleDatabaseError(res, error))
-          })
-        })
-        .catch((error) => handleDatabaseError(res, error))
-    })
-    .catch((error) => handleDatabaseError(res, error))
-})
+      if (!user) {
+        return res.status(400).json({ error: 'student not found' })
+      }
 
-registrationsRouter.get('/current', checkAdmin, (req, res) => {
+      const registrationManagement = await db.RegistrationManagement.findOne({
+        order: [['createdAt', 'DESC']]
+      })
+
+      if (!registrationManagement) {
+        return res
+          .status(400)
+          .json({ error: 'registration management configuration not found' })
+      }
+
+      const configuration = await db.Configuration.findByPk(
+        registrationManagement.project_registration_conf
+      )
+
+      if (!configuration) {
+        return res.status(400).json({ error: 'configuration not found' })
+      }
+
+      const registration = await db.Registration.findOne({
+        where: {
+          configuration_id: configuration.id,
+          studentStudentNumber: loggedInUserStudentNumber
+        }
+      })
+
+      if (registration) {
+        return res.status(400).json({ error: 'student already registered' })
+      }
+
+      const newRegistration = await db.Registration.create({
+        preferred_topics: req.body.preferred_topics,
+        questions: req.body.questions,
+        configuration_id: configuration.id
+      })
+      await newRegistration.setStudent(loggedInUserStudentNumber)
+      return res.status(201).json({ newRegistration })
+    } catch (error) {
+      handleDatabaseError(res, error)
+    }
+  }
+)
+
+registrationsRouter.get('/current', checkAdmin, async (req, res) => {
   const formatJson = (registration) => {
     registration.preferred_topics.forEach((topic) => {
       delete topic.content.description
@@ -97,52 +112,55 @@ registrationsRouter.get('/current', checkAdmin, (req, res) => {
     }
   }
 
-  db.Configuration.findOne({ where: { active: true } })
-    .then((config) => {
-      if (!config)
-        return res.status(400).json({ error: 'no active configuration found' })
-
-      db.Registration.findAll({
-        where: { configuration_id: config.id },
-        include: ['student']
-      })
-        .then((registrations) => {
-          res.status(200).json({
-            registrationCount: registrations.length,
-            registrations: registrations.map(formatJson)
-          })
-        })
-        .catch((error) => handleDatabaseError(res, error))
-      // config.getRegistrations()
-      //   .then(registrations => {
-      //     res.status(200).json({ registrations })
-      //   })
-      //   .catch(error => handleDatabaseError(res, error))
+  try {
+    const registrationManagement = await db.RegistrationManagement.findOne({
+      order: [['createdAt', 'DESC']]
     })
-    .catch((error) => handleDatabaseError(res, error))
+
+    const registrations = db.Registration.findAll({
+      where: {
+        configuration_id: registrationManagement.project_registration_conf
+      }
+    })
+
+    res.status(200).json({
+      registrationCount: registrations.length,
+      registrations: registrations.map(formatJson)
+    })
+  } catch (error) {
+    handleDatabaseError(res, error)
+  }
 })
 
-registrationsRouter.get('/', checkLogin, (req, res) => {
+registrationsRouter.get('/', checkLogin, async (req, res) => {
   const loggedInUserStudentNumber = req.user.id
 
-  db.Configuration.findOne({ where: { active: true } })
-    .then((config) => {
-      db.Registration.findOne({
-        where: {
-          configuration_id: config.id,
-          studentStudentNumber: loggedInUserStudentNumber
-        },
-        include: ['student']
-      }).then((registration) => {
-        if (!registration) {
-          return res.status(204).send()
-        }
-        return res.status(200).json({ registration: registration })
-      })
+  try {
+    const registrationManagement = await db.RegistrationManagement.findOne({
+      order: [['createdAt', 'DESC']]
     })
-    .catch((error) => {
-      handleDatabaseError(res, error)
+
+    const peerReviewConf = registrationManagement.peer_review_conf
+    const projectConf = registrationManagement.project_registration_conf
+
+    const registrations = await db.Registration.findAll({
+      where: {
+        [Op.or]: [
+          { configuration_id: peerReviewConf },
+          { configuration_id: projectConf }
+        ],
+        studentStudentNumber: loggedInUserStudentNumber
+      },
+      include: ['student']
     })
+
+    if (!registrations) {
+      return res.status(204).send()
+    }
+    return res.status(200).json({ registrations })
+  } catch (error) {
+    handleDatabaseError(res, error)
+  }
 })
 
 module.exports = registrationsRouter

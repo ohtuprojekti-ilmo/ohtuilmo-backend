@@ -5,6 +5,9 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
+    project_registration_open: {
+      type: Sequelize.BOOLEAN
+    },
     peer_review_open: {
       type: Sequelize.BOOLEAN
     },
@@ -14,9 +17,6 @@ module.exports = (sequelize, Sequelize) => {
         min: 1,
         max: 2
       }
-    },
-    project_registration_open: {
-      type: Sequelize.BOOLEAN
     },
     project_registration_message: {
       type: Sequelize.STRING
