@@ -147,9 +147,7 @@ const formatCreatedGroup = (dbGroup, dbGroupStudents) => {
     topicId,
     instructorId,
     configurationId,
-    // setStudents returns an array of the created group_students rows, but that
-    // array seems to be wrappend in another array too?
-    studentIds: dbGroupStudents[0].map(
+    studentIds: dbGroupStudents.map(
       ({ userStudentNumber }) => userStudentNumber
     )
   }
@@ -195,7 +193,14 @@ router.post('/', checkAdmin, async (req, res) => {
         }
       }
     )
-    res.json(formatCreatedGroup(createdGroup, groupStudents))
+
+    // setStudents returns an array of the created group_students rows, but that
+    // array seems to be wrappend in another array too? if no students were
+    // passed, i.e. an empty array was passed to setStudents, it just returns
+    // an empty array!
+    const students = groupStudents.length > 0 ? groupStudents[0] : []
+
+    res.json(formatCreatedGroup(createdGroup, students))
   } catch (err) {
     console.error('Error while creating group', err)
     res.status(500).json({ error: 'Internal server error' })
