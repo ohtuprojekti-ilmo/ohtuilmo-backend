@@ -30,6 +30,7 @@ db.connect = () => {
   //const Review_answer = require('./review_answer')
   const RegistrationManagementModel = require('./registration_management')
   const PeerReviewModel = require('./peer_review')
+  const EmailTemplateModel = require('./email_template')
 
   const User = UserModel(sequelize, Sequelize)
   const Group = GroupModel(sequelize, Sequelize)
@@ -47,6 +48,7 @@ db.connect = () => {
     Sequelize
   )
   const PeerReview = PeerReviewModel(sequelize, Sequelize)
+  const EmailTemplate = EmailTemplateModel(sequelize, Sequelize)
 
   db.User = User
   db.Group = Group
@@ -58,6 +60,7 @@ db.connect = () => {
   db.ReviewQuestionSet = ReviewQuestionSet
   db.RegistrationManagement = RegistrationManagement
   db.PeerReview = PeerReview
+  db.EmailTemplate = EmailTemplate
 
   Group.belongsTo(Topic, {
     as: 'topic'
