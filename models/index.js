@@ -35,8 +35,11 @@ db.connect = () => {
   const PeerReviewModel = require('./peer_review')
   const EmailTemplateModel = require('./email_template')
   const InstructorReviewModel = require('./instructor_review')
+<<<<<<< 7529b048b27327e0f197764d35d26a0de19ad24a
 
   const CustomerReviewModel = require('./customer_review')
+=======
+>>>>>>> rebase fix
 
   const User = UserModel(sequelize, Sequelize)
   const Group = GroupModel(sequelize, Sequelize)
@@ -61,7 +64,10 @@ db.connect = () => {
   )
   const PeerReview = PeerReviewModel(sequelize, Sequelize)
   const EmailTemplate = EmailTemplateModel(sequelize, Sequelize)
+<<<<<<< 7529b048b27327e0f197764d35d26a0de19ad24a
   const CustomerReview = CustomerReviewModel(sequelize, Sequelize)
+=======
+>>>>>>> rebase fix
   const InstructorReview = InstructorReviewModel(sequelize, Sequelize)
 
   db.User = User
@@ -79,8 +85,11 @@ db.connect = () => {
   db.PeerReview = PeerReview
   db.EmailTemplate = EmailTemplate
   db.InstructorReview = InstructorReview
+<<<<<<< 7529b048b27327e0f197764d35d26a0de19ad24a
 
   db.CustomerReview = CustomerReview
+=======
+>>>>>>> rebase fix
 
   Group.belongsTo(Topic, {
     as: 'topic'
@@ -111,6 +120,7 @@ db.connect = () => {
     foreignKey: 'configuration_id'
   })
 
+<<<<<<< 7529b048b27327e0f197764d35d26a0de19ad24a
   CustomerReview.belongsTo(Group, {
     as: 'group',
     foreignKey: 'group_id'
@@ -128,6 +138,8 @@ db.connect = () => {
     foreignKey: 'configuration_id'
   })
 
+=======
+>>>>>>> rebase fix
   Configuration.hasOne(RegistrationManagement, {
     as: 'peer_review_configuration',
     foreignKey: 'peer_review_conf'
