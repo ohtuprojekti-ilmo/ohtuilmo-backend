@@ -3,14 +3,14 @@
 const replaceTopicName = (template, replacement) =>
   template.replace(/{{topicName}}/g, replacement)
 
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize, Sequelize) => {
   const EmailTemplate = sequelize.define(
     'email_templates',
     {
-      topic_accepted_fin: DataTypes.STRING,
-      topic_rejected_fin: DataTypes.STRING,
-      topic_accepted_eng: DataTypes.STRING,
-      topic_rejected_eng: DataTypes.STRING
+      topic_accepted_fin: Sequelize.TEXT,
+      topic_rejected_fin: Sequelize.TEXT,
+      topic_accepted_eng: Sequelize.TEXT,
+      topic_rejected_eng: Sequelize.TEXT
     },
     {
       underscored: true
