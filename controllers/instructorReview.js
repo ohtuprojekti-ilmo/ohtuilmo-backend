@@ -14,19 +14,9 @@ const validateAnswerSheet = (instructorReview) => {
     return 'No instructor review found'
   }
 
-  const {
-    user_id,
-    answer_sheet,
-    configuration_id,
-    review_round
-  } = instructorReview
+  const { user_id, answer_sheet } = instructorReview
 
-  if (
-    isNil(user_id) ||
-    isNil(answer_sheet) ||
-    isNil(configuration_id) ||
-    isNil(review_round)
-  ) {
+  if (isNil(user_id) || isNil(answer_sheet)) {
     return 'All attributes must be defined.'
   }
   let error = null
@@ -66,8 +56,8 @@ const validateNumberAnswer = (question) => {
   if (question.answer < 0) {
     return 'Number answer can not be negative'
   }
-  if (question.answer > 100000) {
-    return 'Number question can not be that large'
+  if (question.answer > 5) {
+    return 'Grade can not be over 5.'
   }
   return null
 }
@@ -88,9 +78,7 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
   if (!instructorReview.user_id || req.user.id !== instructorReview.user_id) {
     return res.status(401).json({ error: 'unauthorized' })
   }
-
   const error = validateAnswerSheet(instructorReview)
-
   if (error) {
     return res.status(400).json({ error })
   }
