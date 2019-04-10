@@ -5,12 +5,8 @@ const emailConfig = require('../config/').email
 const { checkAdmin } = require('../middleware')
 
 const sendSecretLink = (secretId, address) => {
-  const options = {
-    to: address,
-    subject: emailConfig.subjects.secretLink,
-    html: `Thank you for the project proposal. You can use the below link to view or edit your proposal. \n <a href="http://studies.cs.helsinki.fi/projekti/topics/${secretId}">Edit your submission</a>`
-  }
-  send(options)
+  const html = `Thank you for the project proposal. You can use the below link to view or edit your proposal. <br /> <a href="http://studies.cs.helsinki.fi/projekti/topics/${secretId}">Edit your submission</a>`
+  send(address, emailConfig.subjects.secretLink, html)
 }
 
 const send = (to, subject, html, text) => {
