@@ -64,8 +64,21 @@ const validateNumberAnswer = (question) => {
 
 const create = async (req, res) => {
   const { instructorReview } = req.body
+  let { answer_sheet, group_name, user_id } = instructorReview
+  if (group_name) {
+    answer_sheet = {
+      answer_sheet,
+      group_name
+    }
+  }
+  const newAnswerSheet = {
+    answer_sheet,
+    user_id
+  }
+  console.log('********', newAnswerSheet, '********')
+
   try {
-    const sentAnswerSheet = await db.InstructorReview.create(instructorReview)
+    const sentAnswerSheet = await db.InstructorReview.create(newAnswerSheet)
     return res.status(201).json(sentAnswerSheet)
   } catch (err) {
     return handleDatabaseError(res, err)
@@ -87,11 +100,10 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
 
 instructorReviewRouter.get('/', checkLogin, async (req, res) => {
   try {
-    const config = await db.Configuration.findOne({ where: { active: true } })
+    //const config = await db.Configuration.findOne({ where: { active: true } })
     const entries = await db.InstructorReview.findAll({
       where: {
-        user_id: req.user.id,
-        configuration_id: config.id
+        user_id: req.user.id
       }
     })
 
