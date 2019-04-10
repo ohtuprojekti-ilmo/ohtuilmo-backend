@@ -96,6 +96,13 @@ customerReviewRouter.get('/all', checkAdmin, async (req, res) => {
   }
 })
 
+const hasCustomerAlreadyAnswered = async (groupId) => {
+  const foundAnswer = await db.CustomerReview.findOne({
+    where: { group_id: groupId }
+  })
+  return !!foundAnswer
+}
+
 //Haetaan topicin secret idllä data sisään customer review sivulle (groupid, groupname ja config)
 customerReviewRouter.get('/:id', async (req, res) => {
   //Sisään tulee topicin secret_id hae sillä topic -> group, groupista id nimi ja config
@@ -125,17 +132,7 @@ customerReviewRouter.get('/:id', async (req, res) => {
 
     //data tulee läpi
 
-    const checkAnswer = await db.CustomerReview.findOne({
-      where: {
-        group_id: group.id
-      }
-    })
-
-    let hasAnswered = false
-
-    if (checkAnswer) {
-      hasAnswered = true
-    }
+    const hasAnswered = await hasCustomerAlreadyAnswered(group.id)
 
     res.status(200).json({
       groupId: group.id,

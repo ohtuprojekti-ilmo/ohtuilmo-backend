@@ -7,77 +7,90 @@ const handleDatabaseError = (res, error) => {
   res.status(500).json({ error: 'database error ' })
 }
 
-const createCustomerReviewQuestionSet = (req, res) => {
-  db.CustomerReviewQuestionSet.create({
-    name: req.body.name,
-    questions: req.body.questions
-  })
-    .then((createdSet) => res.status(200).json({ questionSet: createdSet }))
-    .catch((error) => handleDatabaseError(res, error))
-}
-
-const updateCustomerReviewQuestionSet = (req, res, questionSet) => {
-  questionSet
-    .update({
+const createCustomerReviewQuestionSet = async (req, res) => {
+  try {
+    const createdSet = await db.CustomerReviewQuestionSet.create({
       name: req.body.name,
       questions: req.body.questions
     })
-    .then((questionSet) => {
-      questionSet
-        .reload()
-        .then((updatedSet) => {
-          res.status(200).json({ questionSet: updatedSet })
-        })
-        .catch((error) => handleDatabaseError(res, error))
-    })
-    .catch((error) => handleDatabaseError(res, error))
+    res.status(200).json({ questionSet: createdSet })
+  } catch (e) {
+    handleDatabaseError(res, e)
+  }
 }
 
-const createChecks = (req, res) => {
-  if (!req.body.name) return res.status(400).json({ error: 'name undefined' })
-  db.CustomerReviewQuestionSet.findOne({ where: { name: req.body.name } })
-    .then((foundSet) => {
-      if (foundSet)
-        return res.status(400).json({ error: 'name already in use' })
-      createCustomerReviewQuestionSet(req, res)
+const updateCustomerReviewQuestionSet = async (req, res, questionSet) => {
+  try {
+    const updatedSet = await questionSet.update({
+      name: req.body.name,
+      questions: req.body.questions
     })
-    .catch((error) => handleDatabaseError(res, error))
+
+    const reloadedSet = await updatedSet.reload()
+    res.status(200).json({ questionSet: reloadedSet })
+  } catch (e) {
+    handleDatabaseError(res, e)
+  }
 }
 
-const updateChecks = (req, res) => {
-  if (isNaN(req.params.id)) return res.status(400).json({ error: 'invalid id' })
-  if (!req.body.name) return res.status(400).json({ error: 'name undefined' })
-  db.CustomerReviewQuestionSet.findOne({ where: { name: req.body.name } }).then(
-    (duplicateNameSet) => {
-      if (duplicateNameSet && duplicateNameSet.id !== parseInt(req.params.id))
-        return res.status(400).json({ error: 'name already in use' })
-      db.CustomerReviewQuestionSet.findOne({
-        where: { id: req.params.id }
-      }).then((foundSet) => {
-        if (!foundSet)
-          return res
-            .status(400)
-            .json({ error: 'no customer review question set with that id' })
-        updateCustomerReviewQuestionSet(req, res, foundSet)
-      })
+customerReviewQuestionSetsRouter.post('/', checkAdmin, async (req, res) => {
+  if (!req.body.name) {
+    return res.status(400).json({ error: 'name undefined' })
+  }
+
+  try {
+    const foundSet = await db.CustomerReviewQuestionSet.findOne({
+      where: { name: req.body.name }
+    })
+    if (foundSet) {
+      return res.status(400).json({ error: 'name already in use' })
     }
-  )
-}
-
-customerReviewQuestionSetsRouter.post('/', checkAdmin, (req, res) => {
-  createChecks(req, res)
+    await createCustomerReviewQuestionSet(req, res)
+  } catch (e) {
+    handleDatabaseError(res, e)
+  }
 })
 
-customerReviewQuestionSetsRouter.put('/:id', checkAdmin, (req, res) => {
-  updateChecks(req, res)
-})
+customerReviewQuestionSetsRouter.put('/:id', checkAdmin, async (req, res) => {
+  if (isNaN(req.params.id)) {
+    return res.status(400).json({ error: 'invalid id' })
+  }
+  if (!req.body.name) {
+    return res.status(400).json({ error: 'name undefined' })
+  }
 
-customerReviewQuestionSetsRouter.get('/', checkAdmin, (req, res) => {
-  db.CustomerReviewQuestionSet.findAll({})
-    .then((foundSets) => {
-      res.status(200).json({ questionSets: foundSets })
+  try {
+    const duplicateNameSet = await db.CustomerReviewQuestionSet.findOne({
+      where: { name: req.body.name }
     })
-    .catch((error) => handleDatabaseError(res, error))
+
+    if (duplicateNameSet && duplicateNameSet.id !== parseInt(req.params.id)) {
+      return res.status(400).json({ error: 'name already in use' })
+    }
+
+    const foundSet = await db.CustomerReviewQuestionSet.findOne({
+      where: { id: req.params.id }
+    })
+
+    if (!foundSet) {
+      return res
+        .status(400)
+        .json({ error: 'no customer review question set with that id' })
+    }
+
+    await updateCustomerReviewQuestionSet(req, res, foundSet)
+  } catch (e) {
+    handleDatabaseError(res, e)
+  }
+})
+
+customerReviewQuestionSetsRouter.get('/', checkAdmin, async (req, res) => {
+  try {
+    const foundSets = await db.CustomerReviewQuestionSet.findAll({})
+    res.status(200).json({ questionSets: foundSets })
+  } catch (e) {
+    handleDatabaseError(res, e)
+  }
 })
 
 customerReviewQuestionSetsRouter.get('/:id', checkLogin, async (req, res) => {
