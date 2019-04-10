@@ -1,6 +1,6 @@
 const customerReviewRouter = require('express').Router()
 const db = require('../models/index')
-const { checkLogin, checkAdmin } = require('../middleware')
+const { checkAdmin } = require('../middleware')
 
 const handleDatabaseError = (res, error) => {
   console.log(error)
@@ -58,7 +58,7 @@ const validateNumberAnswer = (question) => {
   if (question.answer < 0) {
     return 'Number answer can not be negative'
   }
-  if (question.answer > 100000) {
+  if (question.answer > 5) {
     return 'Number question can not be that large'
   }
   return null
@@ -77,30 +77,12 @@ const create = async (req, res) => {
 customerReviewRouter.post('/', async (req, res) => {
   const { customerReview } = req.body
 
-  /*   if (!customerReview.group_id || !customerReview.configuration_id || !customerReview.answer_sheet) {
-    return res.status(401).json({ error: 'Missing data' })
-  } */
-
   const error = validateAnswerSheet(customerReview)
 
   if (error) {
     return res.status(400).json({ error })
   }
   create(req, res)
-})
-
-customerReviewRouter.get('/', checkLogin, async (req, res) => {
-  try {
-    const entries = await db.CustomerReview.findAll({
-      where: {
-        group_id: req.group.id
-      }
-    })
-
-    return res.status(200).json(entries)
-  } catch (err) {
-    return handleDatabaseError(res, err)
-  }
 })
 
 customerReviewRouter.get('/all', checkAdmin, async (req, res) => {
@@ -139,7 +121,6 @@ customerReviewRouter.get('/:id', async (req, res) => {
 
     if (!group) {
       return res.status(200).json(null)
-      /* return res.status(400).json({ error: 'no group found for topic' }) */
     }
 
     //data tulee läpi
@@ -155,24 +136,6 @@ customerReviewRouter.get('/:id', async (req, res) => {
     if (checkAnswer) {
       hasAnswered = true
     }
-
-    /*       if(!checkAnswer){
-        res.status(200).json({
-          groupId: group.id,
-          groupName: group.name,
-          configuration: group.configurationId,
-          hasAnswered: false
-        })
-      }
-
-      if(checkAnswer){
-        res.status(200).json({
-          groupId: group.id,
-          groupName: group.name,
-          configuration: group.configurationId,
-          hasAnswered: true
-        })
-      } */
 
     res.status(200).json({
       groupId: group.id,
