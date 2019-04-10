@@ -49,7 +49,10 @@ db.connect = () => {
   )
   const ReviewQuestionSet = ReviewQuestionSetModel(sequelize, Sequelize)
 
-  const CustomerReviewQuestionSet = CustomerReviewQuestionSetModel(sequelize, Sequelize)
+  const CustomerReviewQuestionSet = CustomerReviewQuestionSetModel(
+    sequelize,
+    Sequelize
+  )
 
   const RegistrationManagement = RegistrationManagementModel(
     sequelize,

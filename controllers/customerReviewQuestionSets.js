@@ -51,15 +51,15 @@ const updateChecks = (req, res) => {
     (duplicateNameSet) => {
       if (duplicateNameSet && duplicateNameSet.id !== parseInt(req.params.id))
         return res.status(400).json({ error: 'name already in use' })
-      db.CustomerReviewQuestionSet.findOne({ where: { id: req.params.id } }).then(
-        (foundSet) => {
-          if (!foundSet)
-            return res
-              .status(400)
-              .json({ error: 'no customer review question set with that id' })
-          updateCustomerReviewQuestionSet(req, res, foundSet)
-        }
-      )
+      db.CustomerReviewQuestionSet.findOne({
+        where: { id: req.params.id }
+      }).then((foundSet) => {
+        if (!foundSet)
+          return res
+            .status(400)
+            .json({ error: 'no customer review question set with that id' })
+        updateCustomerReviewQuestionSet(req, res, foundSet)
+      })
     }
   )
 }
@@ -89,29 +89,35 @@ customerReviewQuestionSetsRouter.get('/:id', checkLogin, async (req, res) => {
   }
 })
 
-customerReviewQuestionSetsRouter.delete('/:id', checkAdmin, async (req, res) => {
-  const questionSetId = parseInt(req.params.id, 10)
-  if (isNaN(questionSetId)) {
-    return res.status(400).json({ error: 'invalid id' })
-  }
-
-  try {
-    const targetSet = await db.CustomerReviewQuestionSet.findByPk(questionSetId)
-    if (!targetSet) {
-      // already deleted, eh, just return ok
-      return res.status(204).end()
+customerReviewQuestionSetsRouter.delete(
+  '/:id',
+  checkAdmin,
+  async (req, res) => {
+    const questionSetId = parseInt(req.params.id, 10)
+    if (isNaN(questionSetId)) {
+      return res.status(400).json({ error: 'invalid id' })
     }
 
-    await targetSet.destroy()
-    return res.status(204).end()
-  } catch (err) {
-    console.error(
-      'error while deleting question set with id',
-      req.params.id,
-      err
-    )
-    return res.status(500).json({ error: 'internal server error' })
+    try {
+      const targetSet = await db.CustomerReviewQuestionSet.findByPk(
+        questionSetId
+      )
+      if (!targetSet) {
+        // already deleted, eh, just return ok
+        return res.status(204).end()
+      }
+
+      await targetSet.destroy()
+      return res.status(204).end()
+    } catch (err) {
+      console.error(
+        'error while deleting question set with id',
+        req.params.id,
+        err
+      )
+      return res.status(500).json({ error: 'internal server error' })
+    }
   }
-})
+)
 
 module.exports = customerReviewQuestionSetsRouter

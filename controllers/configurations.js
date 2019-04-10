@@ -199,17 +199,15 @@ configurationsRouter.get(
   }
 )
 
-configurationsRouter.get('/:id/customerreviewquestions',
-  async (req, res) => {
-    try {
-      const response = await db.Configuration.findByPk(req.params.id, {
-        include: 'customer_review_question_set'
-      })
-      res.status(200).json(response.customer_review_question_set)
-    } catch (error) {
-      handleDatabaseError(res, error)
-    }
+configurationsRouter.get('/:id/customerreviewquestions', async (req, res) => {
+  try {
+    const response = await db.Configuration.findByPk(req.params.id, {
+      include: 'customer_review_question_set'
+    })
+    res.status(200).json(response.customer_review_question_set)
+  } catch (error) {
+    handleDatabaseError(res, error)
   }
-)
+})
 
 module.exports = configurationsRouter
