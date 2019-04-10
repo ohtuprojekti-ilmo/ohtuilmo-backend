@@ -6,7 +6,8 @@ const { checkAdmin, checkLogin } = require('../middleware')
 const includeArray = [
   'review_question_set_1',
   'review_question_set_2',
-  'registration_question_set'
+  'registration_question_set',
+  'customer_review_question_set'
 ]
 
 const handleDatabaseError = (res, error) => {
