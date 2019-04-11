@@ -219,28 +219,4 @@ topicsRouter.get('/:id', (req, res) => {
   }
 })
 
-topicsRouter.get('/findSecretId/:id', checkAdmin, (req, res) => {
-  const id = req.params.id
-  if (!id) {
-    res.status(400).json({ error: 'topic id undefined' })
-  } else {
-    db.Topic.findOne({
-      where: {
-        id: id
-      }
-    })
-      .then((topic) => {
-        //console.log('**TOPIC***', topic)
-        if (!topic)
-          return res.status(400).json({ error: 'no topic with that id' })
-        const secret_id = topic.secret_id
-        res.status(200).json({ secret_id })
-      })
-      .catch((error) => {
-        console.log(error)
-        res.status(500).json({ error: 'database error' })
-      })
-  }
-})
-
 module.exports = topicsRouter
