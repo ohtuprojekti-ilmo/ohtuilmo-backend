@@ -31,6 +31,11 @@ const validateAnswerSheet = (customerReview) => {
       if (error) {
         return error
       }
+    } else if (question.type === 'range') {
+      error = validateRangeAnswer(question)
+      if (error) {
+        return error
+      }
     } else if (question.type !== 'info') {
       return 'Invalid question type in answer sheet'
     }
@@ -55,11 +60,12 @@ const validateNumberAnswer = (question) => {
   if (isNil(question.answer)) {
     return 'You must answer all questions'
   }
-  if (question.answer < 0) {
-    return 'Number answer can not be negative'
-  }
-  if (question.answer > 5) {
-    return 'Number question can not be that large'
+  return null
+}
+
+const validateRangeAnswer = (question) => {
+  if (isNil(question.answer)) {
+    return 'You must answer all questions'
   }
   return null
 }
