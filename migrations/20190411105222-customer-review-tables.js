@@ -44,6 +44,9 @@ module.exports = {
       group_id: {
         type: Sequelize.INTEGER
       },
+      topic_id: {
+        type: Sequelize.INTEGER
+      },
       configuration_id: {
         type: Sequelize.INTEGER
       },
@@ -72,6 +75,17 @@ module.exports = {
       type: 'FOREIGN KEY',
       references: {
         table: 'groups',
+        field: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL'
+    })
+
+    await query.addConstraint('customer_reviews', ['topic_id'], {
+      name: 'customer_reviews_topic_id_fkey',
+      type: 'FOREIGN KEY',
+      references: {
+        table: 'topics',
         field: 'id'
       },
       onUpdate: 'CASCADE',
@@ -130,6 +144,10 @@ module.exports = {
     await query.removeConstraint(
       'customer_reviews',
       'customer_reviews_group_fkey'
+    )
+    await query.removeConstraint(
+      'customer_reviews',
+      'customer_reviews_topic_fkey'
     )
 
     await query.dropTable('customer_review_question_sets')

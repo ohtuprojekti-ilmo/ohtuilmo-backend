@@ -112,6 +112,14 @@ db.connect = () => {
     as: 'group',
     foreignKey: 'group_id'
   })
+  CustomerReview.belongsTo(Topic, {
+    as: 'topic',
+    foreignKey: 'topic_id'
+  })
+  Topic.hasMany(CustomerReview, {
+    as: 'customer_review',
+    foreignKey: 'topic_id'
+  })
   CustomerReview.belongsTo(Configuration, {
     as: 'configuration',
     foreignKey: 'configuration_id'

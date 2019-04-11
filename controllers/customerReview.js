@@ -143,6 +143,7 @@ customerReviewRouter.get('/:id', async (req, res) => {
     res.status(200).json({
       groupId: group.id,
       groupName: group.name,
+      topicId: topic.id,
       configuration: group.configurationId,
       hasAnswered: hasAnswered
     })
