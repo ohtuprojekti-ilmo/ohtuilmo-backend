@@ -41,15 +41,6 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
-      group_id: {
-        type: Sequelize.INTEGER
-      },
-      topic_id: {
-        type: Sequelize.INTEGER
-      },
-      configuration_id: {
-        type: Sequelize.INTEGER
-      },
       answer_sheet: {
         type: Sequelize.JSONB
       },
@@ -61,6 +52,16 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false
+      },
+      // foreign keys
+      group_id: {
+        type: Sequelize.INTEGER
+      },
+      topic_id: {
+        type: Sequelize.INTEGER
+      },
+      configuration_id: {
+        type: Sequelize.INTEGER
       }
     })
 
