@@ -19,8 +19,8 @@ const email = {
     host: 'smtp.helsinki.fi',
     port: 587,
     secure: false,
-    replyTo: 'mluukkai@cs.helsinki.fi',
-    cc: 'mluukkai@cs.helsinki.fi'
+    replyTo: 'matti.luukkainen@helsinki.fi',
+    cc: 'matti.luukkainen@helsinki.fi'
   },
   subjects: {
     topicAccepted: {
