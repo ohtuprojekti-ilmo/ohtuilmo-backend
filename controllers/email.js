@@ -1,3 +1,4 @@
+const util = require('util')
 const emailRouter = require('express').Router()
 const nodemailer = require('nodemailer')
 const db = require('../models/index')
@@ -9,7 +10,7 @@ const sendSecretLink = (secretId, address) => {
   send(address, emailConfig.subjects.secretLink, html)
 }
 
-const send = (to, subject, html, text) => {
+const send = async (to, subject, html, text) => {
   const transporter = nodemailer.createTransport({
     host: emailConfig.general.host,
     port: emailConfig.general.port,
@@ -28,33 +29,28 @@ const send = (to, subject, html, text) => {
 
   if (!emailConfig.isEnabled) {
     console.log('Email not enabled with EMAIL_ENABLED=true, skipping mail')
-    return Promise.resolve()
+    return
   }
 
-  return new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error)
-        reject(error)
-        return
-      }
+  const sendMailAsync = util.promisify(transporter.sendMail.bind(transporter))
 
-      if (info.rejected.length > 0) {
-        const rejectedEmails = info.rejected.join(', ')
-        const error = new Error(
-          `SMTP server rejected the following recipients: ${rejectedEmails}`
-        )
+  try {
+    const info = await sendMailAsync(mailOptions)
 
-        console.error(error)
-        console.error(info)
-        reject(error)
-        return
-      }
+    if (info.rejected.length > 0) {
+      const rejectedEmails = info.rejected.join(', ')
+      const error = new Error(
+        `SMTP server rejected the following recipients: ${rejectedEmails}`
+      )
+      console.error(info)
+      throw error
+    }
 
-      console.log('email sent', info)
-      resolve(info)
-    })
-  })
+    console.log('email sent', info)
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
 }
 
 const validateBody = (body) => {
