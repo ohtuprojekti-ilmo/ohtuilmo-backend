@@ -36,6 +36,8 @@ db.connect = () => {
   const EmailTemplateModel = require('./email_template')
   const InstructorReviewModel = require('./instructor_review')
   const CustomerReviewModel = require('./customer_review')
+  const SentTopicEmailModel = require('./sent_topic_email')
+
   const User = UserModel(sequelize, Sequelize)
   const Group = GroupModel(sequelize, Sequelize)
   const Topic = TopicModel(sequelize, Sequelize)
@@ -59,6 +61,7 @@ db.connect = () => {
   const EmailTemplate = EmailTemplateModel(sequelize, Sequelize)
   const CustomerReview = CustomerReviewModel(sequelize, Sequelize)
   const InstructorReview = InstructorReviewModel(sequelize, Sequelize)
+  const SentTopicEmail = SentTopicEmailModel(sequelize, Sequelize)
 
   db.User = User
   db.Group = Group
@@ -77,6 +80,7 @@ db.connect = () => {
   db.InstructorReview = InstructorReview
 
   db.CustomerReview = CustomerReview
+  db.SentTopicEmail = SentTopicEmail
 
   Group.belongsTo(Topic, {
     as: 'topic'
@@ -147,6 +151,15 @@ db.connect = () => {
   InstructorReview.belongsTo(User, {
     as: 'user',
     foreignKey: 'user_id'
+  })
+
+  SentTopicEmail.belongsTo(Topic, {
+    as: 'topic',
+    foreignKey: 'topic_id'
+  })
+  Topic.hasMany(SentTopicEmail, {
+    as: 'sent_emails',
+    foreignKey: 'topic_id'
   })
 
   db.Configuration.associate(db)
