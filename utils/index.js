@@ -43,7 +43,15 @@ const emailTypeToTemplateName = (messageType, messageLanguage) =>
 const templateNameToEmailType = (templateName) =>
   dbColumnToMsgType[templateName]
 
+/**
+ * reverse(uppercase(trim(str)))
+ *   is same as  ↓
+ * pipe(trim, uppercase, reverse)(str)
+ */
+const pipe = (...fns) => (value) => fns.reduce((v, fn) => fn(v), value)
+
 module.exports = {
   emailTypeToTemplateName,
-  templateNameToEmailType
+  templateNameToEmailType,
+  pipe
 }
