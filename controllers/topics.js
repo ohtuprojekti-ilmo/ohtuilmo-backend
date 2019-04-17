@@ -5,7 +5,7 @@ const email = require('./email')
 const getRandomId = require('../utils/idGeneration').getRandomId
 const shuffle = require('shuffle-array')
 
-const format = (topic) => {
+const censorSecretId = (topic) => {
   let formatted = topic
   formatted.secret_id = ''
   return formatted
@@ -95,7 +95,7 @@ topicsRouter.put(
             })
             .then((topic) => {
               topic.reload().then((topic) => {
-                topic = format(topic)
+                topic = censorSecretId(topic)
                 res.status(200).json({ topic })
               })
             })
@@ -121,7 +121,7 @@ topicsRouter.put(
             })
             .then((topic) => {
               topic.reload().then((topic) => {
-                topic = format(topic)
+                topic = censorSecretId(topic)
                 res.status(200).json({ topic })
               })
             })
@@ -138,18 +138,38 @@ topicsRouter.put(
   }
 )
 
-topicsRouter.get('/', checkAdmin, (req, res) => {
-  db.Topic.findAll({})
-    .then((topics) => {
-      res
-        .status(200)
-        .json({ topics: shuffle(topics.map((topic) => format(topic))) })
+
+const serializeHasReviewed = (topicModel) => {
+  const plainTopic = topicModel.get({ plain: true })
+  const { customer_review, ...topic } = plainTopic
+
+  const hasReviewed = customer_review && customer_review.length > 0
+  return censorSecretId({
+    ...topic,
+    hasReviewed
+  })
+}
+
+topicsRouter.get('/', checkAdmin, async (req, res) => {
+  try {
+    const topics = await db.Topic.findAll({
+      where: {},
+      include: [
+        {
+          model: db.CustomerReview,
+          as: 'customer_review'
+        }
+      ]
     })
-    .catch((error) => {
-      console.log(error)
-      res.status(500).json({ error: 'database error' })
-    })
+
+    return res.status(200).json({ topics: topics.map(serializeHasReviewed) })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'database error' })
+  }
 })
+
+
 
 /**
  * Active topics for project registration
@@ -174,7 +194,7 @@ topicsRouter.get('/active', async (req, res) => {
     })
 
     return res.status(200).json({
-      topics: shuffle(activeTopics.map((topic) => format(topic)))
+      topics: shuffle(activeTopics.map((topic) => censorSecretId(topic)))
     })
   } catch (error) {
     console.log(error)
@@ -193,7 +213,7 @@ topicsRouter.get('/:id', (req, res) => {
       .then((topic) => {
         if (!topic)
           return res.status(400).json({ error: 'no topic with that id' })
-        topic = format(topic)
+        topic = censorSecretId(topic)
         res.status(200).json({ topic })
       })
       .catch((error) => {
@@ -209,7 +229,7 @@ topicsRouter.get('/:id', (req, res) => {
       .then((topic) => {
         if (!topic)
           return res.status(400).json({ error: 'no topic with that id' })
-        topic = format(topic)
+        topic = censorSecretId(topic)
         res.status(200).json({ topic })
       })
       .catch((error) => {
