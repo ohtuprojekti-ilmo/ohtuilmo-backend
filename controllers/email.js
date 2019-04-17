@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer')
 const db = require('../models/index')
 const emailConfig = require('../config/').email
 const { checkAdmin } = require('../middleware')
+const { emailTypeToTemplateName } = require('../utils')
 
 const sendSecretLink = (secretId, address) => {
   const html = `Thank you for the project proposal. You can use the below link to view or edit your proposal. <br /> <a href="http://studies.cs.helsinki.fi/projekti/topics/${secretId}">Edit your submission</a>`
@@ -96,17 +97,6 @@ const validateSendBody = async (req, res, next) => {
   next()
 }
 
-const msgTypeToDbColumnMapping = {
-  topicAccepted: {
-    finnish: 'topic_accepted_fin',
-    english: 'topic_accepted_eng'
-  },
-  topicRejected: {
-    finnish: 'topic_rejected_fin',
-    english: 'topic_rejected_eng'
-  }
-}
-
 emailRouter.post('/send', checkAdmin, validateSendBody, async (req, res) => {
   const templates = await db.EmailTemplate.findOne({
     order: [['created_at', 'DESC']]
@@ -120,14 +110,18 @@ emailRouter.post('/send', checkAdmin, validateSendBody, async (req, res) => {
 
   const { address, messageType, messageLanguage, templateContext } = req.body
 
-  const dbTemplateName = msgTypeToDbColumnMapping[messageType][messageLanguage]
+  const dbTemplateName = emailTypeToTemplateName(messageType, messageLanguage)
 
   const renderedEmail = templates.render(dbTemplateName, templateContext)
   const subject = emailConfig.subjects[messageType][messageLanguage]
 
   try {
     await send(address, subject, null, renderedEmail)
-    res.status(200).end()
+    const createdModel = await db.SentTopicEmail.create({
+      topic_id: templateContext.topicId, // trust the admin that the topic id is valid :)
+      email_template_name: dbTemplateName
+    })
+    res.status(200).json(db.SentTopicEmail.format(createdModel))
   } catch (e) {
     res.status(500).json({ error: e.message, details: e })
   }
