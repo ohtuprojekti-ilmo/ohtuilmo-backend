@@ -6,9 +6,6 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       allowNull: false
     },
-    /*     review_round: {
-      type: Sequelize.INTEGER
-    }, */
     answer_sheet: {
       type: Sequelize.JSONB
     },

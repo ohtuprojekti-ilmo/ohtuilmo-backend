@@ -9,10 +9,7 @@ module.exports = {
         autoIncerment: false,
         allowNull: false
       },
-      /*       configuration: {
-        type: Sequelize.STRING,
-        allowNull: true
-      }, */
+
       answer_sheet: {
         type: Sequelize.JSONB,
         allowNull: false
