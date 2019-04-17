@@ -3,8 +3,7 @@ const topicsRouter = require('express').Router()
 const db = require('../models/index')
 const { checkAdmin } = require('../middleware')
 const email = require('./email')
-const { getRandomId } = require('../utils/idGeneration')
-const { pipe } = require('../utils')
+const { getRandomId, pipe } = require('../utils')
 
 const censorSecretId = (topic) => {
   let formatted = topic

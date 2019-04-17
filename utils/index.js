@@ -1,3 +1,5 @@
+const randomstring = require('randomstring')
+
 /**
  * @typedef {'topicAccepted' | 'topicRejected'} MessageType
  * @typedef {'finnish' | 'english'} MessageLanguage
@@ -50,8 +52,13 @@ const templateNameToEmailType = (templateName) =>
  */
 const pipe = (...fns) => (value) => fns.reduce((v, fn) => fn(v), value)
 
+const getRandomId = () => {
+  return 'a' + randomstring.generate(16)
+}
+
 module.exports = {
   emailTypeToTemplateName,
   templateNameToEmailType,
-  pipe
+  pipe,
+  getRandomId
 }
