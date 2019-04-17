@@ -1,6 +1,6 @@
 const instructorReviewRouter = require('express').Router()
 const db = require('../models/index')
-const { checkLogin, checkAdmin } = require('../middleware')
+const { checkLogin } = require('../middleware')
 
 const handleDatabaseError = (res, error) => {
   console.log(error)
@@ -64,18 +64,19 @@ const validateNumberAnswer = (question) => {
 
 const create = async (req, res) => {
   const { instructorReview } = req.body
-  let { answer_sheet, group_name, user_id } = instructorReview
+  let { answer_sheet, group_name, group_id, user_id } = instructorReview
+  console.log('GROUP ID: ', group_id)
   if (group_name) {
     answer_sheet = {
       answer_sheet,
-      group_name
+      group_name,
+      group_id
     }
   }
   const newAnswerSheet = {
     answer_sheet,
     user_id
   }
-  console.log('********', newAnswerSheet, '********')
 
   try {
     const sentAnswerSheet = await db.InstructorReview.create(newAnswerSheet)
@@ -113,132 +114,24 @@ instructorReviewRouter.get('/', checkLogin, async (req, res) => {
   }
 })
 
-instructorReviewRouter.get('/all', checkAdmin, async (req, res) => {
-  try {
-    const reviews = await db.InstructorReview.findAll({
-      include: ['user']
-    })
-    return res.status(200).json(reviews)
-  } catch (error) {
-    return handleDatabaseError(res, error)
-  }
-})
-
-instructorReviewRouter.get('/forInstructor', checkLogin, async (req, res) => {
-  try {
-    const instructedGroups = await db.Group.findAll({
-      where: { instructorId: req.user.id }
-    })
-
-    if (instructedGroups.length === 0) {
-      return res.status(401).json({ error: 'Not instructor' })
-    }
-
-    const instructedConfigurations = instructedGroups.map(
-      (group) => group.configurationId
-    )
-
-    const groupsOfInstructedConfigurations = await db.Group.findAll({
-      where: { configurationId: instructedConfigurations },
-      include: [
-        {
-          as: 'students',
-          model: db.User,
-          attributes: ['student_number', 'first_names', 'last_name'],
-          through: { attributes: [] }
-        },
-        {
-          as: 'configuration',
-          model: db.Configuration
-        },
-        {
-          as: 'instructor',
-          model: db.User
+instructorReviewRouter.get(
+  '/getAllAnsweredGroupId',
+  checkLogin,
+  async (req, res) => {
+    try {
+      const reviews = await db.InstructorReview.findAll({
+        where: {
+          user_id: req.user.id
         }
-      ]
-    })
+      })
+      console.log(reviews[0])
+      const reviewGroups = reviews.map((review) => review.answer_sheet.group_id)
 
-    const allAnswers = await db.InstructorReview.findAll({
-      include: ['user']
-    })
-
-    const filterAndFormatAnswers = (answers, group, round) => {
-      return answers
-        .filter(
-          (answer) =>
-            group.students
-              .map(({ student_number }) => student_number)
-              .includes(answer.user.student_number) &&
-            answer.configuration_id === group.configurationId &&
-            answer.review_round === round
-        )
-        .map((answer) => {
-          return {
-            student: {
-              first_names: answer.user.first_names,
-              last_name: answer.user.last_name
-            },
-            answer_sheet: answer.answer_sheet
-          }
-        })
+      return res.status(200).json(reviewGroups)
+    } catch (error) {
+      return handleDatabaseError(res, error)
     }
-
-    const answersByGroup = groupsOfInstructedConfigurations.reduce(
-      (list, group) => {
-        const round1Answers = filterAndFormatAnswers(allAnswers, group, 1)
-        const round2Answers = filterAndFormatAnswers(allAnswers, group, 2)
-
-        list = list.concat({
-          group: {
-            id: group.id,
-            name: group.name,
-            studentNames: group.students.map(
-              (student) => student.first_names + ' ' + student.last_name
-            ),
-            configurationId: group.configurationId,
-            configurationName: group.configuration.name,
-            instructorName: group.instructor
-              ? group.instructor.first_names + ' ' + group.instructor.last_name
-              : ''
-          },
-          round1Answers,
-          round2Answers
-        })
-
-        return list
-      },
-      []
-    )
-
-    return res.status(200).json(answersByGroup)
-  } catch (error) {
-    return handleDatabaseError(res, error)
   }
-})
-
-instructorReviewRouter.delete('/:id', checkAdmin, async (req, res) => {
-  const instructorReviewId = parseInt(req.params.id, 10)
-  if (isNaN(instructorReviewId)) {
-    return res.status(400).json({ error: 'invalid id' })
-  }
-
-  try {
-    const targetSet = await db.InstructorReview.findByPk(instructorReviewId)
-    if (!targetSet) {
-      // already deleted, eh, just return ok
-      return res.status(204).end()
-    }
-
-    await targetSet.destroy()
-    return res.status(204).end()
-  } catch (err) {
-    console.error(
-      'error while deleting question set with id',
-      req.params.id,
-      err
-    )
-    return res.status(500).json({ error: 'internal server error' })
-  }
-})
+)
 
 module.exports = instructorReviewRouter
