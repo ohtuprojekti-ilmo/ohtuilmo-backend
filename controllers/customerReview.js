@@ -102,6 +102,55 @@ customerReviewRouter.get('/', checkAdmin, async (req, res) => {
   }
 })
 
+customerReviewRouter.get(
+  '/all/forconfiguration/:id',
+  checkAdmin,
+  async (req, res) => {
+    const id = req.params.id
+    try {
+      const groups = await db.Group.findAll({
+        where: {
+          configurationId: id
+        }
+      })
+
+      const reviews = await db.CustomerReview.findAll({
+        where: {
+          configuration_id: id
+        },
+        include: ['group']
+      })
+
+      const connectAnswerToGroup = (answers, group) => {
+        const connectedAnswers = answers.filter(
+          (answer) => answer.group.id === group.id
+        )
+        if (connectedAnswers.length < 1) {
+          return null
+        }
+        return connectedAnswers[0].answer_sheet
+      }
+
+      const answerByGroup = groups.reduce((list, group) => {
+        const groupAnswer = connectAnswerToGroup(reviews, group)
+
+        list = list.concat({
+          group: {
+            id: group.id,
+            name: group.name,
+            answerSheet: groupAnswer
+          }
+        })
+        return list
+      }, [])
+
+      return res.status(200).json(answerByGroup)
+    } catch (error) {
+      return handleDatabaseError(res, error)
+    }
+  }
+)
+
 const hasCustomerAlreadyAnswered = async (groupId) => {
   const foundAnswer = await db.CustomerReview.findOne({
     where: { group_id: groupId }
