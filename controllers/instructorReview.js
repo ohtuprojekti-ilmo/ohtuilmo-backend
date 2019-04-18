@@ -70,7 +70,7 @@ const validateNumberAnswer = (question) => {
 const create = async (req, res) => {
   const { instructorReview } = req.body
 
-  let { answer_sheet, group_name, group_id, user_id } = instructorReview
+  const { answer_sheet, group_name, group_id, user_id } = instructorReview
 
   const newAnswerSheet = {
     answer_sheet: {
@@ -80,7 +80,6 @@ const create = async (req, res) => {
     },
     user_id
   }
-
 
   try {
     const sentAnswerSheet = await db.InstructorReview.create(newAnswerSheet)
