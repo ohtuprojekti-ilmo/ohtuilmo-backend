@@ -92,7 +92,11 @@ const create = async (req, res) => {
 instructorReviewRouter.post('/', checkLogin, async (req, res) => {
   const { instructorReview } = req.body
 
-  if (!instructorReview.user_id || req.user.id !== instructorReview.user_id) {
+  if (
+    !instructorReview ||
+    !instructorReview.user_id ||
+    req.user.id !== instructorReview.user_id
+  ) {
     return res.status(401).json({ error: 'unauthorized' })
   }
   const error = validateAnswerSheet(instructorReview)
