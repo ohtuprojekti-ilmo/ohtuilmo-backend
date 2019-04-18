@@ -65,7 +65,6 @@ const validateNumberAnswer = (question) => {
 const create = async (req, res) => {
   const { instructorReview } = req.body
   let { answer_sheet, group_name, group_id, user_id } = instructorReview
-  console.log('GROUP ID: ', group_id)
   if (group_name) {
     answer_sheet = {
       answer_sheet,
@@ -92,7 +91,7 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
   if (!instructorReview.user_id || req.user.id !== instructorReview.user_id) {
     return res.status(401).json({ error: 'unauthorized' })
   }
-  const error = validateAnswerSheet(instructorReview)
+  const error = validateAnswerSheet(instructorReview.answer_sheet)
   if (error) {
     return res.status(400).json({ error })
   }
@@ -101,7 +100,6 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
 
 instructorReviewRouter.get('/', checkLogin, async (req, res) => {
   try {
-    //const config = await db.Configuration.findOne({ where: { active: true } })
     const entries = await db.InstructorReview.findAll({
       where: {
         user_id: req.user.id
@@ -124,7 +122,6 @@ instructorReviewRouter.get(
           user_id: req.user.id
         }
       })
-      console.log(reviews[0])
       const reviewGroups = reviews.map((review) => review.answer_sheet.group_id)
 
       return res.status(200).json(reviewGroups)
