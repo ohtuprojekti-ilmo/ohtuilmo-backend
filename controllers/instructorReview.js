@@ -14,10 +14,9 @@ const validateAnswerSheet = (instructorReview) => {
     return 'No instructor review found'
   }
 
-  const { user_id, answer_sheet } = instructorReview
-  const answers = answer_sheet
+  const { user_id, group_id, answer_sheet } = instructorReview
 
-  if (isNil(user_id) || isNil(answers)) {
+  if (isNil(group_id) || isNil(user_id) || isNil(answer_sheet)) {
     return 'All attributes must be defined.'
   }
 
