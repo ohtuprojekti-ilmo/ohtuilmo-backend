@@ -71,17 +71,16 @@ const create = async (req, res) => {
   const { instructorReview } = req.body
 
   let { answer_sheet, group_name, group_id, user_id } = instructorReview
-  if (group_name) {
-    answer_sheet = {
+
+  const newAnswerSheet = {
+    answer_sheet: {
       answer_sheet,
       group_name,
       group_id
-    }
-  }
-  const newAnswerSheet = {
-    answer_sheet,
+    },
     user_id
   }
+
 
   try {
     const sentAnswerSheet = await db.InstructorReview.create(newAnswerSheet)
