@@ -16,8 +16,6 @@ const validateAnswerSheet = (instructorReview) => {
 
   const { user_id, answer_sheet } = instructorReview
   const answers = answer_sheet
-  console.log('*** ANSWER SHEET *** : ', answer_sheet)
-  console.log('*** ANSWERS *** : ', answers)
 
   if (isNil(user_id) || isNil(answers)) {
     return 'All attributes must be defined.'
