@@ -15,21 +15,28 @@ const validateAnswerSheet = (instructorReview) => {
   }
 
   const { user_id, answer_sheet } = instructorReview
+  const answers = answer_sheet
+  console.log('*** ANSWER SHEET *** : ', answer_sheet)
+  console.log('*** ANSWERS *** : ', answers)
 
-  if (isNil(user_id) || isNil(answer_sheet)) {
+  if (isNil(user_id) || isNil(answers)) {
     return 'All attributes must be defined.'
   }
+
   let error = null
-  for (let question of answer_sheet) {
-    if (question.type === 'text') {
-      error = validateTextAnswer(question)
-      if (error) {
-        return error
-      }
-    } else if (question.type === 'number') {
-      error = validateNumberAnswer(question)
-      if (error) {
-        return error
+
+  for (let student of answer_sheet) {
+    for (let question of student.answers) {
+      if (question.type === 'text') {
+        error = validateTextAnswer(question)
+        if (error) {
+          return error
+        }
+      } else if (question.type === 'number') {
+        error = validateNumberAnswer(question)
+        if (error) {
+          return error
+        }
       }
     }
   }
@@ -50,7 +57,7 @@ const validateTextAnswer = (question) => {
 }
 
 const validateNumberAnswer = (question) => {
-  if (isNil(question.answer)) {
+  if (isNil(question.answer) || question.answer.length === 0) {
     return 'You must answer all questions'
   }
   if (question.answer < 0) {
@@ -64,6 +71,7 @@ const validateNumberAnswer = (question) => {
 
 const create = async (req, res) => {
   const { instructorReview } = req.body
+
   let { answer_sheet, group_name, group_id, user_id } = instructorReview
   if (group_name) {
     answer_sheet = {
@@ -91,7 +99,7 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
   if (!instructorReview.user_id || req.user.id !== instructorReview.user_id) {
     return res.status(401).json({ error: 'unauthorized' })
   }
-  const error = validateAnswerSheet(instructorReview.answer_sheet)
+  const error = validateAnswerSheet(instructorReview)
   if (error) {
     return res.status(400).json({ error })
   }
