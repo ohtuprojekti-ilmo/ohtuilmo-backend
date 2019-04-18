@@ -149,10 +149,6 @@ db.connect = () => {
     foreignKey: 'user_id'
   })
 
-  InstructorReview.belongsTo(Configuration, {
-    as: 'configuration',
-    foreignKey: 'configuration_id'
-  })
   db.Configuration.associate(db)
   db.Registration.associate(db)
 
