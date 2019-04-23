@@ -127,6 +127,11 @@ emailRouter.post('/send', checkAdmin, validateSendBody, async (req, res) => {
   }
 })
 
+emailRouter.delete('/sent-emails', checkAdmin, async (req, res) => {
+  await db.SentTopicEmail.destroy({ where: {} })
+  res.status(204).end()
+})
+
 const defaultEmailTemplates = {
   topic_accepted_fin: '',
   topic_rejected_fin: '',
