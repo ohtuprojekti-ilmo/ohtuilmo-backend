@@ -1,15 +1,17 @@
+const util = require('util')
 const emailRouter = require('express').Router()
 const nodemailer = require('nodemailer')
 const db = require('../models/index')
 const emailConfig = require('../config/').email
 const { checkAdmin } = require('../middleware')
+const { emailTypeToTemplateName } = require('../utils')
 
 const sendSecretLink = (secretId, address) => {
   const html = `Thank you for the project proposal. You can use the below link to view or edit your proposal. <br /> <a href="http://studies.cs.helsinki.fi/projekti/topics/${secretId}">Edit your submission</a>`
   send(address, emailConfig.subjects.secretLink, html)
 }
 
-const send = (to, subject, html, text) => {
+const send = async (to, subject, html, text) => {
   const transporter = nodemailer.createTransport({
     host: emailConfig.general.host,
     port: emailConfig.general.port,
@@ -28,33 +30,28 @@ const send = (to, subject, html, text) => {
 
   if (!emailConfig.isEnabled) {
     console.log('Email not enabled with EMAIL_ENABLED=true, skipping mail')
-    return Promise.resolve()
+    return
   }
 
-  return new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error)
-        reject(error)
-        return
-      }
+  const sendMailAsync = util.promisify(transporter.sendMail.bind(transporter))
 
-      if (info.rejected.length > 0) {
-        const rejectedEmails = info.rejected.join(', ')
-        const error = new Error(
-          `SMTP server rejected the following recipients: ${rejectedEmails}`
-        )
+  try {
+    const info = await sendMailAsync(mailOptions)
 
-        console.error(error)
-        console.error(info)
-        reject(error)
-        return
-      }
+    if (info.rejected.length > 0) {
+      const rejectedEmails = info.rejected.join(', ')
+      const error = new Error(
+        `SMTP server rejected the following recipients: ${rejectedEmails}`
+      )
+      console.error(info)
+      throw error
+    }
 
-      console.log('email sent', info)
-      resolve(info)
-    })
-  })
+    console.log('email sent', info)
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
 }
 
 const validateBody = (body) => {
@@ -100,17 +97,6 @@ const validateSendBody = async (req, res, next) => {
   next()
 }
 
-const msgTypeToDbColumnMapping = {
-  topicAccepted: {
-    finnish: 'topic_accepted_fin',
-    english: 'topic_accepted_eng'
-  },
-  topicRejected: {
-    finnish: 'topic_rejected_fin',
-    english: 'topic_rejected_eng'
-  }
-}
-
 emailRouter.post('/send', checkAdmin, validateSendBody, async (req, res) => {
   const templates = await db.EmailTemplate.findOne({
     order: [['created_at', 'DESC']]
@@ -124,17 +110,26 @@ emailRouter.post('/send', checkAdmin, validateSendBody, async (req, res) => {
 
   const { address, messageType, messageLanguage, templateContext } = req.body
 
-  const dbTemplateName = msgTypeToDbColumnMapping[messageType][messageLanguage]
+  const dbTemplateName = emailTypeToTemplateName(messageType, messageLanguage)
 
   const renderedEmail = templates.render(dbTemplateName, templateContext)
   const subject = emailConfig.subjects[messageType][messageLanguage]
 
   try {
     await send(address, subject, null, renderedEmail)
-    res.status(200).end()
+    const createdModel = await db.SentTopicEmail.create({
+      topic_id: templateContext.topicId, // trust the admin that the topic id is valid :)
+      email_template_name: dbTemplateName
+    })
+    res.status(200).json(db.SentTopicEmail.format(createdModel))
   } catch (e) {
     res.status(500).json({ error: e.message, details: e })
   }
+})
+
+emailRouter.delete('/sent-emails', checkAdmin, async (req, res) => {
+  await db.SentTopicEmail.destroy({ where: {} })
+  res.status(204).end()
 })
 
 const defaultEmailTemplates = {

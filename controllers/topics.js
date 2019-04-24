@@ -1,9 +1,9 @@
+const shuffle = require('shuffle-array')
 const topicsRouter = require('express').Router()
 const db = require('../models/index')
 const { checkAdmin } = require('../middleware')
 const email = require('./email')
-const getRandomId = require('../utils/idGeneration').getRandomId
-const shuffle = require('shuffle-array')
+const { getRandomId, pipe } = require('../utils')
 
 const censorSecretId = (topic) => {
   let formatted = topic
@@ -138,16 +138,25 @@ topicsRouter.put(
   }
 )
 
-
-const serializeHasReviewed = (topicModel) => {
-  const plainTopic = topicModel.get({ plain: true })
+const serializeHasReviewed = (plainTopic) => {
+  // remove customer_review from returned object
   const { customer_review, ...topic } = plainTopic
-
   const hasReviewed = customer_review && customer_review.length > 0
-  return censorSecretId({
+
+  return {
     ...topic,
     hasReviewed
-  })
+  }
+}
+
+const serializeSentEmails = (plainTopic) => {
+  const { sent_emails, ...topicWithoutSentEmails } = plainTopic
+  const sentEmails = sent_emails.map(db.SentTopicEmail.format)
+
+  return {
+    ...topicWithoutSentEmails,
+    sentEmails
+  }
 }
 
 topicsRouter.get('/', checkAdmin, async (req, res) => {
@@ -158,18 +167,29 @@ topicsRouter.get('/', checkAdmin, async (req, res) => {
         {
           model: db.CustomerReview,
           as: 'customer_review'
+        },
+        {
+          model: db.SentTopicEmail,
+          as: 'sent_emails'
         }
       ]
     })
 
-    return res.status(200).json({ topics: topics.map(serializeHasReviewed) })
+    const serializer = pipe(
+      // convert Sequelize model instance to plain JS object to avoid
+      // JSON.stringify exploding due to circular references
+      (topicModel) => topicModel.get({ plain: true }),
+      censorSecretId,
+      serializeHasReviewed,
+      serializeSentEmails
+    )
+
+    return res.status(200).json({ topics: topics.map(serializer) })
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: 'database error' })
   }
 })
-
-
 
 /**
  * Active topics for project registration

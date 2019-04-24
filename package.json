@@ -11,7 +11,9 @@
     "db:create": "sequelize db:create",
     "db:drop": "sequelize db:drop",
     "db:migrate": "sequelize db:migrate",
-    "db:seed:all": "sequelize db:seed:all"
+    "db:seed:all": "sequelize db:seed:all",
+    "db:nuke": "npx npm-run-all -s db:drop db:create",
+    "db:recreate": "npx npm-run-all -s db:nuke db:migrate db:seed:all"
   },
   "repository": {
     "type": "git",
