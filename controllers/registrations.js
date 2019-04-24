@@ -120,7 +120,13 @@ registrationsRouter.get('/current', checkAdmin, async (req, res) => {
     const registrations = await db.Registration.findAll({
       where: {
         configuration_id: registrationManagement.project_registration_conf
-      }
+      },
+      include: [
+        {
+          model: db.User,
+          as: 'student'
+        }
+      ]
     })
 
     res.status(200).json({
