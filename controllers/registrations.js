@@ -117,7 +117,7 @@ registrationsRouter.get('/current', checkAdmin, async (req, res) => {
       order: [['createdAt', 'DESC']]
     })
 
-    const registrations = db.Registration.findAll({
+    const registrations = await db.Registration.findAll({
       where: {
         configuration_id: registrationManagement.project_registration_conf
       }
