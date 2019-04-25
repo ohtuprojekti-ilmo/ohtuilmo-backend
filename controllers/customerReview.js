@@ -267,13 +267,7 @@ customerReviewRouter.delete('/:id', checkAdmin, async (req, res) => {
   }
 })
 
-customerReviewRouter.delete('/:customerReviewId', checkAdmin, async (req, res) => {
-  const success = await db.CustomerReview.destroy({ where: { id: req.params.customerReviewId } })
-  success
-    ? console.log(`Customer review ${req.params.customerReviewId} destroyed.`)
-    : console.log('Nothing to delete.')
-  return res.status(204).end()
-})
+
 
 
 module.exports = customerReviewRouter
