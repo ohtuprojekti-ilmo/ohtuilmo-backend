@@ -109,6 +109,32 @@ peerReviewRouter.post('/', checkLogin, async (req, res) => {
   create(req, res)
 })
 
+peerReviewRouter.post('/insertTestData', checkAdmin, async (req, res) => {
+  const { peerReviews } = req.body
+
+  for (let peerReview in peerReviews) {
+    let error = validateAnswerSheet(peerReviews[peerReview])
+
+    if (error) {
+      return res.status(400).json({ error })
+    }
+  }
+  createTestData(req, res)
+})
+const createTestData = async (req, res) => {
+  const { peerReviews } = req.body
+  for (let peerReview in peerReviews) {
+    console.log('*********', peerReviews[peerReview])
+
+    try {
+      let sentAnswerSheet = await db.PeerReview.create(peerReviews[peerReview])
+      res.status(201).json(sentAnswerSheet)
+    } catch (err) {
+      return handleDatabaseError(res, err)
+    }
+  }
+}
+
 peerReviewRouter.get('/', checkLogin, async (req, res) => {
   try {
     const registrationManagement = await db.RegistrationManagement.findOne({
