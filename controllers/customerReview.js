@@ -91,12 +91,12 @@ customerReviewRouter.post('/', async (req, res) => {
   create(req, res)
 })
 
-customerReviewRouter.get('/all', checkAdmin, async (req, res) => {
+customerReviewRouter.get('/', checkAdmin, async (req, res) => {
   try {
-    const reviews = await db.CustomerReview.findAll({
+    const foundReviews = await db.CustomerReview.findAll({
       include: ['group']
     })
-    return res.status(200).json(reviews)
+    return res.status(200).json({ reviews: foundReviews })
   } catch (error) {
     return handleDatabaseError(res, error)
   }
@@ -150,6 +150,34 @@ customerReviewRouter.get('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error while updating group', error)
     return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+customerReviewRouter.delete('/:id', checkAdmin, async (req, res) => {
+  const customerReviewId = req.params.id
+  if (isNaN(customerReviewId)) {
+    return res.status(400).json({ error: 'invalid id' })
+  }
+
+  try {
+    const customerReview = await db.CustomerReview.findOne({
+      where: { id: req.params.id }
+    })
+
+    if (!customerReview) {
+      return res.status(204).send()
+    }
+
+    await customerReview.destroy()
+
+    return res.status(204).send()
+  } catch (err) {
+    console.error(
+      'error while deleting customer review with id',
+      req.params.id,
+      err
+    )
+    return res.status(500).json({ error: 'internal server error' })
   }
 })
 
