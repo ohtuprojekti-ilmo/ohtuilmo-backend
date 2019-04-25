@@ -1,6 +1,6 @@
 const instructorReviewRouter = require('express').Router()
 const db = require('../models/index')
-const { checkLogin } = require('../middleware')
+const { checkLogin, checkAdmin } = require('../middleware')
 
 const handleDatabaseError = (res, error) => {
   console.log(error)
@@ -118,13 +118,9 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
   create(req, res)
 })
 
-instructorReviewRouter.get('/', checkLogin, async (req, res) => {
+instructorReviewRouter.get('/', checkAdmin, async (req, res) => {
   try {
-    const entries = await db.InstructorReview.findAll({
-      where: {
-        user_id: req.user.id
-      }
-    })
+    const entries = await db.InstructorReview.findAll()
 
     return res.status(200).json(entries)
   } catch (err) {
@@ -150,5 +146,33 @@ instructorReviewRouter.get(
     }
   }
 )
+
+instructorReviewRouter.delete('/:id', checkAdmin, async (req, res) => {
+  const instructorReviewId = req.params.id
+  if (isNaN(instructorReviewId)) {
+    return res.status(400).json({ error: 'invalid id' })
+  }
+
+  try {
+    const instructorReview = await db.InstructorReview.findOne({
+      where: { id: req.params.id }
+    })
+
+    if (!instructorReview) {
+      return res.status(204).send()
+    }
+
+    await instructorReview.destroy()
+
+    return res.status(204).send()
+  } catch (err) {
+    console.error(
+      'error while deleting instructor review with id',
+      req.params.id,
+      err
+    )
+    return res.status(500).json({ error: 'internal server error' })
+  }
+})
 
 module.exports = instructorReviewRouter
