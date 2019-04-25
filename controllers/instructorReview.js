@@ -98,6 +98,19 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
   ) {
     return res.status(401).json({ error: 'unauthorized' })
   }
+
+  try {
+    const instructedGroups = await db.Group.findAll({
+      where: { instructorId: req.user.id }
+    })
+    if (instructedGroups.length === 0) {
+      return res.status(401).json({ error: 'unauthorized' })
+    }
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ error: 'database error' })
+  }
+
   const error = validateAnswerSheet(instructorReview)
   if (error) {
     return res.status(400).json({ error })
