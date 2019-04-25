@@ -129,24 +129,6 @@ instructorReviewRouter.get('/', checkAdmin, async (req, res) => {
 })
 
 instructorReviewRouter.get(
-  '/getForInstructor',
-  checkLogin,
-  async (req, res) => {
-    try {
-      const entries = await db.InstructorReview.findAll({
-        where: {
-          user_id: req.user.id
-        }
-      })
-
-      return res.status(200).json(entries)
-    } catch (err) {
-      return handleDatabaseError(res, err)
-    }
-  }
-)
-
-instructorReviewRouter.get(
   '/getAllAnsweredGroupId',
   checkLogin,
   async (req, res) => {
