@@ -136,14 +136,18 @@ const defaultEmailTemplates = {
   topic_accepted_fin: '',
   topic_rejected_fin: '',
   topic_accepted_eng: '',
-  topic_rejected_eng: ''
+  topic_rejected_eng: '',
+  customer_review_link_fin: '',
+  customer_review_link_eng: ''
 }
 
 const serializeTemplatesByLanguage = ({
   topic_accepted_fin,
   topic_rejected_fin,
   topic_accepted_eng,
-  topic_rejected_eng
+  topic_rejected_eng,
+  customer_review_link_fin,
+  customer_review_link_eng
 }) => ({
   topicAccepted: {
     finnish: topic_accepted_fin,
@@ -152,14 +156,24 @@ const serializeTemplatesByLanguage = ({
   topicRejected: {
     finnish: topic_rejected_fin,
     english: topic_rejected_eng
+  },
+  customerReviewLink: {
+    finnish: customer_review_link_fin,
+    english: customer_review_link_eng
   }
 })
 
-const deserializeTemplatesByLanguage = ({ topicAccepted, topicRejected }) => ({
+const deserializeTemplatesByLanguage = ({
+  topicAccepted,
+  topicRejected,
+  customerReviewLink
+}) => ({
   topic_accepted_fin: topicAccepted.finnish,
   topic_rejected_fin: topicRejected.finnish,
   topic_accepted_eng: topicAccepted.english,
-  topic_rejected_eng: topicRejected.english
+  topic_rejected_eng: topicRejected.english,
+  customer_review_link_fin: customerReviewLink.finnish,
+  customer_review_link_eng: customerReviewLink.english
 })
 
 emailRouter.get('/templates', checkAdmin, async (req, res) => {
@@ -183,7 +197,7 @@ const validateTemplates = (body) => {
     return 'All attributes must be defined'
   }
 
-  const { topicAccepted, topicRejected } = body
+  const { topicAccepted, topicRejected, customerReviewLink } = body
   // allow empty strings!
   if (
     isNil(topicAccepted) ||
@@ -191,7 +205,9 @@ const validateTemplates = (body) => {
     isNil(topicAccepted.finnish) ||
     isNil(topicAccepted.english) ||
     isNil(topicRejected.finnish) ||
-    isNil(topicRejected.english)
+    isNil(topicRejected.english) ||
+    isNil(customerReviewLink.finnish) ||
+    isNil(customerReviewLink.english)
   ) {
     return 'All attributes must be defined'
   }
@@ -225,16 +241,20 @@ emailRouter.post(
     const {
       topic_accepted_fin,
       topic_rejected_fin,
+      customer_review_link_fin,
       topic_accepted_eng,
-      topic_rejected_eng
+      topic_rejected_eng,
+      customer_review_link_eng
     } = req.locals.templates
 
     try {
       const createdTemplates = await db.EmailTemplate.create({
         topic_accepted_fin,
         topic_rejected_fin,
+        customer_review_link_fin,
         topic_accepted_eng,
-        topic_rejected_eng
+        topic_rejected_eng,
+        customer_review_link_eng
       })
       res.status(200).json(serializeTemplatesByLanguage(createdTemplates))
     } catch (e) {

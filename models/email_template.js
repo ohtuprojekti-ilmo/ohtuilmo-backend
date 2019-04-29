@@ -10,7 +10,9 @@ module.exports = (sequelize, Sequelize) => {
       topic_accepted_fin: Sequelize.TEXT,
       topic_rejected_fin: Sequelize.TEXT,
       topic_accepted_eng: Sequelize.TEXT,
-      topic_rejected_eng: Sequelize.TEXT
+      topic_rejected_eng: Sequelize.TEXT,
+      customer_review_link_fin: Sequelize.TEXT,
+      customer_review_link_eng: Sequelize.TEXT
     },
     {
       underscored: true
