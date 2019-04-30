@@ -70,7 +70,8 @@ const validateSendBody = (body) => {
 
   if (
     body.messageType !== 'topicAccepted' &&
-    body.messageType !== 'topicRejected'
+    body.messageType !== 'topicRejected' &&
+    body.messageType !== 'customerReviewLink'
   ) {
     return 'invalid messageType'
   }

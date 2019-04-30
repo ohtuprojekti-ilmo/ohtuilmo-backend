@@ -31,6 +31,10 @@ const email = {
       finnish: makeSubjectFin('Aihe-ehdotustasi ei valittu'),
       english: makeSubjectEng('Your topic proposal was not selected')
     },
+    customerReviewLink: {
+      finnish: makeSubjectFin('Asiakkaan arvio on nyt auki'),
+      english: makeSubjectEng('Customer review is now open')
+    },
     secretLink: makeSubjectEng('Project proposal confirmation')
   }
 }
