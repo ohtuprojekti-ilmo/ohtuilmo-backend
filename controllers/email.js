@@ -269,13 +269,8 @@ const validateTemplates = (body) => {
   return null
 }
 
-const validateAndParseTemplates = (req, res, next) => {
+const parseTemplates = (req, res, next) => {
   try {
-    const validationError = validateTemplates(req.body)
-    if (validationError) {
-      return res.status(400).json({ error: validationError })
-    }
-
     const deserialized = deserializeTemplatesByLanguage(req.body)
     req.locals = {
       ...req.locals,
@@ -290,7 +285,8 @@ const validateAndParseTemplates = (req, res, next) => {
 emailRouter.post(
   '/templates',
   checkAdmin,
-  validateAndParseTemplates,
+  bodyValidator(validateTemplates),
+  parseTemplates,
   async (req, res) => {
     const {
       topic_accepted_fin,
