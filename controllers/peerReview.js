@@ -124,8 +124,6 @@ peerReviewRouter.post('/insertTestData', checkAdmin, async (req, res) => {
 const createTestData = async (req, res) => {
   const { peerReviews } = req.body
   for (let peerReview in peerReviews) {
-    console.log('*********', peerReviews[peerReview])
-
     try {
       let sentAnswerSheet = await db.PeerReview.create(peerReviews[peerReview])
       res.status(201).json(sentAnswerSheet)
