@@ -68,14 +68,6 @@ const validateSendBody = (body) => {
     return 'All attributes must be defined'
   }
 
-  if (!body.address) {
-    return 'address is required'
-  }
-
-  if (!body.messageType) {
-    return 'messageType is required'
-  }
-
   if (
     body.messageType !== 'topicAccepted' &&
     body.messageType !== 'topicRejected'
@@ -90,8 +82,8 @@ const validateSendBody = (body) => {
     return 'invalid messageLanguage'
   }
 
-  if (!body.templateContext || !body.templateContext.topicName) {
-    return 'topicName required in templateContext'
+  if (!body.topicId) {
+    return 'topicId required'
   }
 
   return null
@@ -102,6 +94,16 @@ emailRouter.post(
   checkAdmin,
   bodyValidator(validateSendBody),
   async (req, res) => {
+    const { topicId, messageType, messageLanguage } = req.body
+
+    const topic = await db.Topic.findOne({ id: topicId })
+    if (!topic) {
+      return res.status(400).json({ error: `topic "${topicId}" not found` })
+    }
+    if (!topic.content || !topic.content.email) {
+      return res.status(400).json({ error: 'topic has no content or email!' })
+    }
+
     const templates = await db.EmailTemplate.findOne({
       order: [['created_at', 'DESC']]
     })
@@ -112,17 +114,15 @@ emailRouter.post(
         .json({ error: 'email templates have not been configured' })
     }
 
-    const { address, messageType, messageLanguage, templateContext } = req.body
-
     const dbTemplateName = emailTypeToTemplateName(messageType, messageLanguage)
 
-    const renderedEmail = templates.render(dbTemplateName, templateContext)
+    const renderedEmail = templates.render(dbTemplateName, { topic })
     const subject = emailConfig.subjects[messageType][messageLanguage]
 
     try {
-      await send(address, subject, null, renderedEmail)
+      await send(topic.content.email, subject, null, renderedEmail)
       const createdModel = await db.SentTopicEmail.create({
-        topic_id: templateContext.topicId, // trust the admin that the topic id is valid :)
+        topic_id: topic.id,
         email_template_name: dbTemplateName
       })
       res.status(200).json(db.SentTopicEmail.format(createdModel))

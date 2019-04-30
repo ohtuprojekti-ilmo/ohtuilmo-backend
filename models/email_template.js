@@ -1,6 +1,6 @@
 'use strict'
 
-const replaceTopicName = (template, replacement) =>
+const replaceTopicName = (replacement) => (template) =>
   template.replace(/{{topicName}}/g, replacement)
 
 module.exports = (sequelize, Sequelize) => {
@@ -20,9 +20,10 @@ module.exports = (sequelize, Sequelize) => {
   )
 
   EmailTemplate.prototype.render = function render(templateName, context) {
+    const { topic } = context
     const template = this.getDataValue(templateName)
-    const { topicName } = context
-    return replaceTopicName(template, topicName)
+
+    return replaceTopicName(topic.content.title)(template)
   }
 
   return EmailTemplate
