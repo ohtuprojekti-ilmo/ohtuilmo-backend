@@ -39,10 +39,16 @@ const email = {
   }
 }
 
+const urls = {
+  forSecretTopicLink: (secretId) =>
+    `http://studies.cs.helsinki.fi/projekti/topics/${secretId}`
+}
+
 module.exports = {
   dbUrl,
   port,
   login,
   secret,
-  email
+  email,
+  urls
 }

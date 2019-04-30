@@ -2,12 +2,13 @@ const util = require('util')
 const emailRouter = require('express').Router()
 const nodemailer = require('nodemailer')
 const db = require('../models/index')
-const emailConfig = require('../config/').email
+const { email: emailConfig, urls } = require('../config/')
 const { checkAdmin } = require('../middleware')
 const { emailTypeToTemplateName } = require('../utils')
 
 const sendSecretLink = (secretId, address) => {
-  const html = `Thank you for the project proposal. You can use the below link to view or edit your proposal. <br /> <a href="http://studies.cs.helsinki.fi/projekti/topics/${secretId}">Edit your submission</a>`
+  const url = urls.forSecretTopicLink(secretId)
+  const html = `Thank you for the project proposal. You can use the below link to view or edit your proposal. <br /> <a href="${url}">Edit your submission</a>`
   send(address, emailConfig.subjects.secretLink, html)
 }
 
