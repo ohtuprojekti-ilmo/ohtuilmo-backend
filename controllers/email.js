@@ -89,6 +89,42 @@ const validateSendBody = (body) => {
   return null
 }
 
+const validatePreviewBody = validateSendBody
+
+emailRouter.post(
+  '/preview',
+  checkAdmin,
+  bodyValidator(validatePreviewBody),
+  async (req, res) => {
+    const { topicId, messageType, messageLanguage } = req.body
+    const topic = await db.Topic.findOne({ id: topicId })
+    if (!topic) {
+      return res.status(400).json({ error: `topic "${topicId}" not found` })
+    }
+    if (!topic.content || !topic.content.email) {
+      return res.status(400).json({ error: 'topic has no content or email!' })
+    }
+
+    const templates = await db.EmailTemplate.findOne({
+      order: [['created_at', 'DESC']]
+    })
+
+    if (!templates) {
+      return res
+        .status(400)
+        .json({ error: 'email templates have not been configured' })
+    }
+
+    const dbTemplateName = emailTypeToTemplateName(messageType, messageLanguage)
+
+    const renderedEmail = templates.render(dbTemplateName, { topic })
+    const subject = emailConfig.subjects[messageType][messageLanguage]
+    const to = topic.content && topic.content.email
+
+    return res.status(200).json({ subject, to, email: renderedEmail })
+  }
+)
+
 emailRouter.post(
   '/send',
   checkAdmin,
