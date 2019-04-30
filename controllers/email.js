@@ -97,7 +97,8 @@ emailRouter.post(
   bodyValidator(validatePreviewBody),
   async (req, res) => {
     const { topicId, messageType, messageLanguage } = req.body
-    const topic = await db.Topic.findOne({ id: topicId })
+
+    const topic = await db.Topic.findByPk(topicId)
     if (!topic) {
       return res.status(400).json({ error: `topic "${topicId}" not found` })
     }
@@ -132,7 +133,7 @@ emailRouter.post(
   async (req, res) => {
     const { topicId, messageType, messageLanguage } = req.body
 
-    const topic = await db.Topic.findOne({ id: topicId })
+    const topic = await db.Topic.findByPk(topicId)
     if (!topic) {
       return res.status(400).json({ error: `topic "${topicId}" not found` })
     }
