@@ -1,10 +1,12 @@
 'use strict'
 const { pipe } = require('../utils')
+const { urls } = require('../config')
 
-const replaceTopicName = (replacement) => (template) =>
-  template.replace(/{{topicName}}/g, replacement)
-const replaceSecretId = (replacement) => (template) =>
-  template.replace(/{{secretId}}/g, replacement)
+const replaceTopicName = (name) => (template) =>
+  template.replace(/{{topicName}}/g, name)
+
+const replaceSecretLink = (link) => (template) =>
+  template.replace(/{{secretLink}}/g, link)
 
 module.exports = (sequelize, Sequelize) => {
   const EmailTemplate = sequelize.define(
@@ -32,7 +34,8 @@ module.exports = (sequelize, Sequelize) => {
     const operations = [replaceTopicName(topic.content.title)]
 
     if (isCustomerReviewLinkTemplate(templateName)) {
-      operations.push(replaceSecretId(topic.secret_id))
+      const link = urls.forCustomerReviewLink(topic.secret_id)
+      operations.push(replaceSecretLink(link))
     }
 
     return pipe(...operations)(template)
