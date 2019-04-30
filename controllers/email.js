@@ -54,7 +54,16 @@ const send = async (to, subject, html, text) => {
   }
 }
 
-const validateBody = (body) => {
+const bodyValidator = (validator) => (req, res, next) => {
+  const error = validator(req.body)
+  if (error) {
+    return res.status(400).json({ error })
+  }
+
+  next()
+}
+
+const validateSendBody = (body) => {
   if (!body) {
     return 'All attributes must be defined'
   }
@@ -88,44 +97,40 @@ const validateBody = (body) => {
   return null
 }
 
-const validateSendBody = async (req, res, next) => {
-  const validationError = validateBody(req.body)
-  if (validationError) {
-    return res.status(400).json({ error: validationError })
-  }
-
-  next()
-}
-
-emailRouter.post('/send', checkAdmin, validateSendBody, async (req, res) => {
-  const templates = await db.EmailTemplate.findOne({
-    order: [['created_at', 'DESC']]
-  })
-
-  if (!templates) {
-    return res
-      .status(400)
-      .json({ error: 'email templates have not been configured' })
-  }
-
-  const { address, messageType, messageLanguage, templateContext } = req.body
-
-  const dbTemplateName = emailTypeToTemplateName(messageType, messageLanguage)
-
-  const renderedEmail = templates.render(dbTemplateName, templateContext)
-  const subject = emailConfig.subjects[messageType][messageLanguage]
-
-  try {
-    await send(address, subject, null, renderedEmail)
-    const createdModel = await db.SentTopicEmail.create({
-      topic_id: templateContext.topicId, // trust the admin that the topic id is valid :)
-      email_template_name: dbTemplateName
+emailRouter.post(
+  '/send',
+  checkAdmin,
+  bodyValidator(validateSendBody),
+  async (req, res) => {
+    const templates = await db.EmailTemplate.findOne({
+      order: [['created_at', 'DESC']]
     })
-    res.status(200).json(db.SentTopicEmail.format(createdModel))
-  } catch (e) {
-    res.status(500).json({ error: e.message, details: e })
+
+    if (!templates) {
+      return res
+        .status(400)
+        .json({ error: 'email templates have not been configured' })
+    }
+
+    const { address, messageType, messageLanguage, templateContext } = req.body
+
+    const dbTemplateName = emailTypeToTemplateName(messageType, messageLanguage)
+
+    const renderedEmail = templates.render(dbTemplateName, templateContext)
+    const subject = emailConfig.subjects[messageType][messageLanguage]
+
+    try {
+      await send(address, subject, null, renderedEmail)
+      const createdModel = await db.SentTopicEmail.create({
+        topic_id: templateContext.topicId, // trust the admin that the topic id is valid :)
+        email_template_name: dbTemplateName
+      })
+      res.status(200).json(db.SentTopicEmail.format(createdModel))
+    } catch (e) {
+      res.status(500).json({ error: e.message, details: e })
+    }
   }
-})
+)
 
 emailRouter.delete('/sent-emails', checkAdmin, async (req, res) => {
   await db.SentTopicEmail.destroy({ where: {} })
