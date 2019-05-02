@@ -127,7 +127,7 @@ const createTestData = async (req, res) => {
   for (let peerReview in peerReviews) {
     try {
       const sentAnswerSheet = await db.PeerReview.create(peerReviews[peerReview])
-      returnLog.concat(sentAnswerSheet)
+      returnLog = returnLog.concat(sentAnswerSheet)
     } catch (err) {
       return handleDatabaseError(res, err)
     }
