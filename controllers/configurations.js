@@ -211,4 +211,13 @@ configurationsRouter.get('/:id/customerreviewquestions', async (req, res) => {
   }
 })
 
+configurationsRouter.delete('/:configurationId', checkAdmin, async (req, res) => {
+  const success = await db.Configuration.destroy({ where: { id: req.params.configurationId } })
+  success
+    ? console.log(`Configuration ${req.params.configurationId} destroyed.`)
+    : console.log('Nothing to delete.')
+  return res.status(204).end()
+})
+
+
 module.exports = configurationsRouter
