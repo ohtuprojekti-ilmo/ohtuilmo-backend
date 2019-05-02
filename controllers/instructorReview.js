@@ -120,9 +120,8 @@ instructorReviewRouter.post('/', checkLogin, async (req, res) => {
 
 instructorReviewRouter.get('/', checkAdmin, async (req, res) => {
   try {
-    const entries = await db.InstructorReview.findAll()
-
-    return res.status(200).json(entries)
+    const foundInstructorReviews = await db.InstructorReview.findAll()
+    return res.status(200).json({ reviews: foundInstructorReviews })
   } catch (err) {
     return handleDatabaseError(res, err)
   }
