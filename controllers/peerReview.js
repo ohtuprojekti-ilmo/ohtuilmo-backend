@@ -123,14 +123,16 @@ peerReviewRouter.post('/insertTestData', checkAdmin, async (req, res) => {
 })
 const createTestData = async (req, res) => {
   const { peerReviews } = req.body
+  let returnLog = []
   for (let peerReview in peerReviews) {
     try {
-      let sentAnswerSheet = await db.PeerReview.create(peerReviews[peerReview])
-      res.status(201).json(sentAnswerSheet)
+      const sentAnswerSheet = await db.PeerReview.create(peerReviews[peerReview])
+      returnLog.concat(sentAnswerSheet)
     } catch (err) {
       return handleDatabaseError(res, err)
     }
   }
+  return res.status(201).json(returnLog)
 }
 
 peerReviewRouter.get('/', checkLogin, async (req, res) => {
