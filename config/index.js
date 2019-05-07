@@ -41,9 +41,9 @@ const email = {
 
 const urls = {
   forSecretTopicLink: (secretId) =>
-    `http://studies.cs.helsinki.fi/projekti/topics/${secretId}`,
+    `https://studies.cs.helsinki.fi/projekti/topics/${secretId}`,
   forCustomerReviewLink: (secretId) =>
-    `http://studies.cs.helsinki.fi/projekti/customer-review/${secretId}`
+    `https://studies.cs.helsinki.fi/projekti/customer-review/${secretId}`
 }
 
 module.exports = {
