@@ -1,9 +1,9 @@
 const randomstring = require('randomstring')
 
 /**
- * @typedef {'topicAccepted' | 'topicRejected'} MessageType
+ * @typedef {'topicAccepted' | 'topicRejected' | 'customerReviewLink'} MessageType
  * @typedef {'finnish' | 'english'} MessageLanguage
- * @typedef {'topic_accepted_fin' | 'topic_accepted_eng' | 'topic_rejected_fin' | 'topic_rejected_eng'} TemplateName
+ * @typedef {'topic_accepted_fin' | 'topic_accepted_eng' | 'topic_rejected_fin' | 'topic_rejected_eng' | 'customer_review_link_fin' | 'customer_review_link_eng'} TemplateName
  */
 
 /**
@@ -17,6 +17,10 @@ const msgTypeToDbColumn = {
   topicRejected: {
     finnish: 'topic_rejected_fin',
     english: 'topic_rejected_eng'
+  },
+  customerReviewLink: {
+    finnish: 'customer_review_link_fin',
+    english: 'customer_review_link_eng'
   }
 }
 
@@ -27,7 +31,9 @@ const dbColumnToMsgType = {
   topic_accepted_fin: { type: 'topicAccepted', language: 'finnish' },
   topic_accepted_eng: { type: 'topicAccepted', language: 'english' },
   topic_rejected_fin: { type: 'topicRejected', language: 'finnish' },
-  topic_rejected_eng: { type: 'topicRejected', language: 'english' }
+  topic_rejected_eng: { type: 'topicRejected', language: 'english' },
+  customer_review_link_fin: { type: 'customerReviewLink', language: 'finnish' },
+  customer_review_link_eng: { type: 'customerReviewLink', language: 'english' }
 }
 
 /**
