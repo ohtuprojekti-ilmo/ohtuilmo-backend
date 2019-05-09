@@ -256,6 +256,7 @@ const validateTemplates = (body) => {
   if (
     isNil(topicAccepted) ||
     isNil(topicRejected) ||
+    isNil(customerReviewLink) ||
     isNil(topicAccepted.finnish) ||
     isNil(topicAccepted.english) ||
     isNil(topicRejected.finnish) ||
