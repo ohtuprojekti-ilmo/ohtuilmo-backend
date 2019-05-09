@@ -26,6 +26,11 @@ const validateAnswerSheet = (customerReview) => {
       if (error) {
         return error
       }
+    } else if (question.type === 'oneliner') {
+      error = validateOnelinerAnswer(question)
+      if (error) {
+        return error
+      }
     } else if (question.type === 'number') {
       error = validateNumberAnswer(question)
       if (error) {
@@ -52,6 +57,19 @@ const validateTextAnswer = (question) => {
   }
   if (question.answer.length > 5000) {
     return 'Text answer must be less than 5000 characters.'
+  }
+  return null
+}
+
+const validateOnelinerAnswer = (question) => {
+  if (question.answer.length === 0) {
+    return 'You must answer all questions'
+  }
+  if (question.answer.length < 5) {
+    return 'Short text answers must be over 5 characters long.'
+  }
+  if (question.answer.length > 100) {
+    return 'Short text answer must be less than 100 characters.'
   }
   return null
 }
@@ -266,6 +284,5 @@ customerReviewRouter.delete('/:id', checkAdmin, async (req, res) => {
     return res.status(500).json({ error: 'internal server error' })
   }
 })
-
 
 module.exports = customerReviewRouter
