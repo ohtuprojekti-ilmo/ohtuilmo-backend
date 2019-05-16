@@ -5,7 +5,7 @@ Clone and run:
 `npm install`
 
 ## Instructions
-[How to start frontend, backend and database using docker-compose](https://github.com/ohtuprojekti-ilmo/ohtuilmo-frontend/wiki)
+[How to start frontend, backend and database using docker-compose](https://github.com/ohtuprojekti-ilmo/ohtuilmo-frontend)
 
 ## Environment variables
 
