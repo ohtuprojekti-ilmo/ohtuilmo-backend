@@ -44,8 +44,8 @@ const validateTextAnswer = (question) => {
   if (question.answer.length === 0) {
     return 'You must answer all questions'
   }
-  if (question.answer.length < 30) {
-    return 'Text answers must be over 30 characters long.'
+  if (question.answer.length < 5) {
+    return 'Text answers must be over 5 characters long.'
   }
   if (question.answer.length > 5000) {
     return 'Text answer must be less than 5000 characters.'
