@@ -2,7 +2,7 @@ const http = require('http')
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const { logger } = require('./middleware')
+const { logger, fakeshibbo } = require('./middleware')
 const config = require('./config/')
 const app = express()
 
@@ -19,6 +19,7 @@ var unless = (path, middleware) => {
 // Middleware
 app.use(cors())
 app.use(bodyParser.json())
+app.use(fakeshibbo)
 app.use(unless('/api/login', logger))
 
 // Routers

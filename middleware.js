@@ -84,9 +84,22 @@ const checkAdmin = (req, res, next) => {
 }
 
 /** @type {RequestHandler} */
+const fakeshibbo = (req, res, next) => {
+  req.headers.employeenumber = '9876543'
+  req.headers.mail = 'pekka.m.testaaja@helsinki.fi'
+  req.headers.schacpersonaluniquecode =
+    'urn:schac:personalUniqueCode:int:studentID:helsinki.fi:011110002'
+  req.headers.uid = 'pemtest'
+  req.headers.givenname = 'Pekka'
+  req.headers.sn = 'Testaaja'
+  next()
+}
+
+/** @type {RequestHandler} */
 const logger = (request, response, next) => {
   console.log('Method:', request.method)
   console.log('Path:  ', request.path)
+  console.log('Headers:', request.headers) // FOR FAKESHIBBO!
   console.log('Body:  ', request.body)
   console.log('---')
   next()
@@ -95,5 +108,6 @@ const logger = (request, response, next) => {
 module.exports = {
   checkLogin,
   checkAdmin,
-  logger
+  logger,
+  fakeshibbo
 }
