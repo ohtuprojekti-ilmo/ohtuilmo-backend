@@ -36,6 +36,31 @@ const registrationCheck = async (req, res, next) => {
   }
 }
 
+topicsRouter.post('/:id/copy', async (req, res) => {
+  const conf = await db.RegistrationManagement.findOne({
+    order: [['createdAt', 'DESC']]
+  })
+
+  const from = await db.Topic.findById(req.params.id)
+
+  const secret_id = getRandomId()
+
+  db.Topic.create({
+    active: true,
+    configuration_id: conf.topic_registration_conf,
+    content: from.content,
+    acronym: from.acronym,
+    secret_id
+  })
+    .then((topic) => {
+      res.status(200).json({ topic })
+    })
+    .catch((error) => {
+      console.log(error)
+      res.status(500).json({ error: 'database error' })
+    })
+})
+
 topicsRouter.post('/', registrationCheck, (req, res) => {
   if (!req.body.content)
     return res.status(400).json({ error: 'content undefined' })
@@ -179,7 +204,6 @@ topicsRouter.get('/', checkAdmin, async (req, res) => {
       // convert Sequelize model instance to plain JS object to avoid
       // JSON.stringify exploding due to circular references
       (topicModel) => topicModel.get({ plain: true }),
-      censorSecretId,
       serializeHasReviewed,
       serializeSentEmails
     )
