@@ -9,11 +9,15 @@ const handleDatabaseError = (res, error) => {
 }
 
 loginRouter.post('/', async (req, res) => {
+  if (!req.headers.schacpersonaluniquecode)
+    return res
+      .status(401)
+      .json({ error: 'Student number missing from headers.' })
+      .end()
+
   db.User.findOne({
     where: {
-      student_number: req.headers.schacpersonaluniquecode
-        ? req.headers.schacpersonaluniquecode.split(':')[6]
-        : null
+      student_number: req.headers.schacpersonaluniquecode.split(':')[6]
     }
   })
     .then((foundUser) => {

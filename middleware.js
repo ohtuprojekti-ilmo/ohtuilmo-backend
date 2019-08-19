@@ -99,7 +99,6 @@ const fakeshibbo = (req, res, next) => {
 const logger = (request, response, next) => {
   console.log('Method:', request.method)
   console.log('Path:  ', request.path)
-  console.log('Headers:', request.headers) // FOR FAKESHIBBO!
   console.log('Body:  ', request.body)
   console.log('---')
   next()
