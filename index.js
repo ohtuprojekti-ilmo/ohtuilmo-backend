@@ -3,6 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const { logger } = require('./middleware')
+const headersMiddleware = require('unfuck-utf8-headers-middleware')
 const config = require('./config/')
 const app = express()
 
@@ -16,9 +17,21 @@ var unless = (path, middleware) => {
   }
 }
 
+/**
+ * Fix charset for shibboleth headers
+ */
+const shibbolethHeaders = [
+  'uid',
+  'givenname', // First name
+  'mail', // Email
+  'schacpersonaluniquecode', // Contains student number
+  'sn' // Last name
+]
+
 // Middleware
 app.use(cors())
 app.use(bodyParser.json())
+app.use(headersMiddleware(shibbolethHeaders))
 app.use(unless('/api/login', logger))
 
 // Routers
