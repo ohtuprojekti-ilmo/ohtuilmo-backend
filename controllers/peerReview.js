@@ -167,9 +167,10 @@ peerReviewRouter.get('/all', checkAdmin, async (req, res) => {
 
 peerReviewRouter.get('/forInstructor', checkLogin, async (req, res) => {
   try {
-    const instructedGroups = await db.Group.findAll({
+    const query = req.user.admin ? {} : {
       where: { instructorId: req.user.id }
-    })
+    }
+    const instructedGroups = await db.Group.findAll(query)
 
     if (instructedGroups.length === 0) {
       return res.status(401).json({ error: 'Not instructor' })
