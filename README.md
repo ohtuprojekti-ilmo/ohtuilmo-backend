@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ohtuprojekti-ilmo/ohtuilmo-backend.svg?branch=master)](https://travis-ci.org/ohtuprojekti-ilmo/ohtuilmo-backend)
+[![Build Status](https://travis-ci.org/UniversityOfHelsinkiCS/ohtuilmo-backend.svg?branch=master)](https://travis-ci.org/UniversityOfHelsinkiCS/ohtuilmo-backend)
 
 ## Installation
 Clone and run:
