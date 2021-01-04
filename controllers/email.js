@@ -50,6 +50,7 @@ const send = async (to, subject, html, text) => {
 
     console.log('email sent', info)
   } catch (error) {
+    console.error('Mailing send failed')
     console.error(error)
     throw error
   }
@@ -176,6 +177,8 @@ emailRouter.post(
       })
       res.status(200).json(db.SentTopicEmail.format(createdModel))
     } catch (e) {
+      console.error('Mailing failed')
+      console.error(e)
       res.status(500).json({ error: e.message, details: e })
     }
   }
