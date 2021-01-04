@@ -35,7 +35,7 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.4",
     "jsonwebtoken": "^8.4.0",
-    "nodemailer": "^4.6.8",
+    "nodemailer": "^6.4.17",
     "pg": "^7.6.1",
     "pg-hstore": "^2.3.2",
     "randomstring": "^1.1.5",
