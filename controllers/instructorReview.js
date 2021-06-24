@@ -137,6 +137,7 @@ instructorReviewRouter.get(
           user_id: req.user.id
         }
       })
+
       const reviewGroups = reviews.map((review) => review.answer_sheet.group_id)
 
       return res.status(200).json(reviewGroups)

@@ -16,7 +16,10 @@ loginRouter.post('/', async (req, res) => {
       .json({ error: 'Student number missing from headers.' })
       .end()
 
-  const student_number = req.headers.schacpersonaluniquecode.split(':')[6]
+  const student_number = req.headers.hyPersonStudentId // schacpersonaluniquecode.split(':')[6]
+
+  console.log(student_number)
+  console.log(req.headers)
 
   db.User.findOne({
     where: { student_number }
